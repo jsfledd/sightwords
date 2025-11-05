@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-export interface AttemptRecord {
-  timestamp: number // Unix timestamp in milliseconds
-  correct: boolean
+export interface SessionRecord {
+  correct: number
+  attempted: number
 }
 
 export interface WordStats {
   word: string
   correct: number
   incorrect: number
-  attempts?: AttemptRecord[] // Historical log of attempts
+  sessions?: SessionRecord[] // Queue of recent practice sessions (max 10)
 }
 
 export interface Collection {
@@ -130,7 +130,7 @@ export const useCollectionsStore = defineStore('collections', () => {
     }
   }
 
-  // Record a word attempt
+  // Record a word attempt (legacy - still updates totals)
   const recordWordAttempt = (collectionId: string, word: string, correct: boolean) => {
     const collection = getCollectionById(collectionId)
     if (!collection) return
@@ -141,7 +141,7 @@ export const useCollectionsStore = defineStore('collections', () => {
         word: w,
         correct: 0,
         incorrect: 0,
-        attempts: []
+        sessions: []
       }))
     }
 
@@ -149,25 +149,8 @@ export const useCollectionsStore = defineStore('collections', () => {
     let wordStats = collection.stats.find(s => s.word === word)
     if (!wordStats) {
       // Word not in stats yet, add it
-      wordStats = { word, correct: 0, incorrect: 0, attempts: [] }
+      wordStats = { word, correct: 0, incorrect: 0, sessions: [] }
       collection.stats.push(wordStats)
-    }
-
-    // Initialize attempts array if it doesn't exist (migration support)
-    if (!wordStats.attempts) {
-      wordStats.attempts = []
-    }
-
-    // Create attempt record
-    const attempt: AttemptRecord = {
-      timestamp: Date.now(),
-      correct
-    }
-
-    // Add to attempts history (keep last 20 attempts to manage storage)
-    wordStats.attempts.push(attempt)
-    if (wordStats.attempts.length > 20) {
-      wordStats.attempts.shift() // Remove oldest
     }
 
     // Update the count
@@ -176,6 +159,53 @@ export const useCollectionsStore = defineStore('collections', () => {
     } else {
       wordStats.incorrect++
     }
+
+    saveToLocalStorage()
+  }
+
+  // Record session results for a word
+  const recordWordSession = (collectionId: string, word: string, correct: number, attempted: number) => {
+    const collection = getCollectionById(collectionId)
+    if (!collection) return
+
+    // Initialize stats if needed
+    if (!collection.stats) {
+      collection.stats = collection.words.map(w => ({
+        word: w,
+        correct: 0,
+        incorrect: 0,
+        sessions: []
+      }))
+    }
+
+    // Find the word's stats
+    let wordStats = collection.stats.find(s => s.word === word)
+    if (!wordStats) {
+      // Word not in stats yet, add it
+      wordStats = { word, correct: 0, incorrect: 0, sessions: [] }
+      collection.stats.push(wordStats)
+    }
+
+    // Initialize sessions array if it doesn't exist (migration support)
+    if (!wordStats.sessions) {
+      wordStats.sessions = []
+    }
+
+    // Create session record
+    const session: SessionRecord = {
+      correct,
+      attempted
+    }
+
+    // Add to session queue (keep last 10 sessions)
+    wordStats.sessions.push(session)
+    if (wordStats.sessions.length > 10) {
+      wordStats.sessions.shift() // Remove oldest
+    }
+
+    // Update aggregate counts
+    wordStats.correct += correct
+    wordStats.incorrect += (attempted - correct)
 
     saveToLocalStorage()
   }
@@ -194,46 +224,56 @@ export const useCollectionsStore = defineStore('collections', () => {
     return Math.round((stats.correct / total) * 100)
   }
 
-  // Get recent attempts for graphing (last N attempts)
-  const getRecentAttempts = (collectionId: string, word: string, limit: number = 10): AttemptRecord[] => {
+  // Get recent sessions for graphing (last N sessions)
+  const getRecentSessions = (collectionId: string, word: string, limit: number = 10): SessionRecord[] => {
     const stats = getWordStats(collectionId, word)
-    if (!stats || !stats.attempts || stats.attempts.length === 0) {
+    if (!stats || !stats.sessions || stats.sessions.length === 0) {
       return []
     }
-    // Return last N attempts
-    return stats.attempts.slice(-limit)
+    // Return last N sessions
+    return stats.sessions.slice(-limit)
   }
 
-  // Get collection-wide accuracy trend (average of all words' recent attempts)
-  const getCollectionTrend = (collectionId: string, limit: number = 10): number[] => {
+  // Get collection-wide session data (aggregate sessions by index across all words)
+  const getCollectionSessions = (collectionId: string, limit: number = 10): SessionRecord[] => {
     const collection = getCollectionById(collectionId)
     if (!collection || !collection.stats) return []
 
-    // Get all attempts across all words, sorted by timestamp
-    const allAttempts: AttemptRecord[] = []
+    // Find the maximum number of sessions any word has
+    let maxSessions = 0
     collection.stats.forEach(stat => {
-      if (stat.attempts) {
-        allAttempts.push(...stat.attempts)
+      if (stat.sessions && stat.sessions.length > maxSessions) {
+        maxSessions = stat.sessions.length
       }
     })
 
-    if (allAttempts.length === 0) return []
+    if (maxSessions === 0) return []
 
-    // Sort by timestamp
-    allAttempts.sort((a, b) => a.timestamp - b.timestamp)
+    // Aggregate sessions by index (session 0, 1, 2, etc.)
+    const aggregatedSessions: SessionRecord[] = []
 
-    // Take last N attempts
-    const recentAttempts = allAttempts.slice(-limit)
+    for (let i = 0; i < maxSessions; i++) {
+      let totalCorrect = 0
+      let totalAttempted = 0
 
-    // Calculate rolling accuracy for each point
-    const trend: number[] = []
-    for (let i = 0; i < recentAttempts.length; i++) {
-      const correctCount = recentAttempts.slice(0, i + 1).filter(a => a.correct).length
-      const accuracy = (correctCount / (i + 1)) * 100
-      trend.push(accuracy)
+      collection.stats.forEach(stat => {
+        if (stat.sessions && stat.sessions[i]) {
+          const session = stat.sessions[i]
+          if (session) {
+            totalCorrect += session.correct
+            totalAttempted += session.attempted
+          }
+        }
+      })
+
+      aggregatedSessions.push({
+        correct: totalCorrect,
+        attempted: totalAttempted
+      })
     }
 
-    return trend
+    // Return last N sessions
+    return aggregatedSessions.slice(-limit)
   }
 
   return {
@@ -247,9 +287,10 @@ export const useCollectionsStore = defineStore('collections', () => {
     getWordsFromCollections,
     initializeStats,
     recordWordAttempt,
+    recordWordSession,
     getWordStats,
     getWordPercentage,
-    getRecentAttempts,
-    getCollectionTrend
+    getRecentSessions,
+    getCollectionSessions
   }
 })

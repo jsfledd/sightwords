@@ -1,35 +1,37 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { AttemptRecord } from '../stores/collections'
+import type { SessionRecord } from '../stores/collections'
 
 interface Props {
-  attempts: AttemptRecord[]
+  sessions: SessionRecord[]
   width?: number
   height?: number
-  showMinAttempts?: number // Minimum attempts needed to show graph
+  showMinSessions?: number // Minimum sessions needed to show graph
 }
 
 const props = withDefaults(defineProps<Props>(), {
   width: 100,
   height: 30,
-  showMinAttempts: 3
+  showMinSessions: 3
 })
 
 // Calculate path for line graph
 const graphPath = computed(() => {
-  if (props.attempts.length < props.showMinAttempts) {
+  if (props.sessions.length < props.showMinSessions) {
     return ''
   }
 
   const points: { x: number; y: number; accuracy: number }[] = []
 
-  // Calculate rolling accuracy for each point
-  for (let i = 0; i < props.attempts.length; i++) {
-    const attemptsUpToNow = props.attempts.slice(0, i + 1)
-    const correctCount = attemptsUpToNow.filter(a => a.correct).length
-    const accuracy = (correctCount / (i + 1)) * 100
+  // Calculate accuracy for each session
+  for (let i = 0; i < props.sessions.length; i++) {
+    const session = props.sessions[i]
+    if (!session) continue
 
-    const x = (i / Math.max(props.attempts.length - 1, 1)) * props.width
+    // Calculate accuracy as percentage: correct/attempted * 100
+    const accuracy = session.attempted > 0 ? (session.correct / session.attempted) * 100 : 0
+
+    const x = (i / Math.max(props.sessions.length - 1, 1)) * props.width
     const y = props.height - (accuracy / 100) * props.height
 
     points.push({ x, y, accuracy })
@@ -52,74 +54,13 @@ const graphPath = computed(() => {
   return path
 })
 
-// Calculate color based on current accuracy
-const currentAccuracy = computed(() => {
-  if (props.attempts.length === 0) return 0
-  const correctCount = props.attempts.filter(a => a.correct).length
-  return (correctCount / props.attempts.length) * 100
-})
-
-const strokeColor = computed(() => {
-  const acc = currentAccuracy.value
-  if (acc >= 90) return '#10b981' // green-500
-  if (acc >= 80) return '#eab308' // yellow-500
-  if (acc >= 70) return '#f97316' // orange-500
-  return '#ef4444' // red-500
-})
-
-// Create gradient for area fill
+// Create vertical gradient for accuracy levels (red at bottom, green at top)
 const gradientId = computed(() => {
   return `gradient-${Math.random().toString(36).substring(7)}`
 })
 
-// Calculate points for filled area
-const areaPath = computed(() => {
-  if (props.attempts.length < props.showMinAttempts) {
-    return ''
-  }
-
-  const points: { x: number; y: number }[] = []
-
-  // Calculate rolling accuracy for each point
-  for (let i = 0; i < props.attempts.length; i++) {
-    const attemptsUpToNow = props.attempts.slice(0, i + 1)
-    const correctCount = attemptsUpToNow.filter(a => a.correct).length
-    const accuracy = (correctCount / (i + 1)) * 100
-
-    const x = (i / Math.max(props.attempts.length - 1, 1)) * props.width
-    const y = props.height - (accuracy / 100) * props.height
-
-    points.push({ x, y })
-  }
-
-  if (points.length === 0) return ''
-
-  const firstPoint = points[0]
-  if (!firstPoint) return ''
-
-  // Start from bottom left
-  let path = `M 0 ${props.height}`
-
-  // Go up to first point
-  path += ` L ${firstPoint.x} ${firstPoint.y}`
-
-  // Follow the line
-  for (let i = 1; i < points.length; i++) {
-    const point = points[i]
-    if (point) {
-      path += ` L ${point.x} ${point.y}`
-    }
-  }
-
-  // Go down to bottom right and close
-  path += ` L ${props.width} ${props.height}`
-  path += ` Z`
-
-  return path
-})
-
 const hasEnoughData = computed(() => {
-  return props.attempts.length >= props.showMinAttempts
+  return props.sessions.length >= props.showMinSessions
 })
 </script>
 
@@ -133,23 +74,19 @@ const hasEnoughData = computed(() => {
       :viewBox="`0 0 ${width} ${height}`"
     >
       <defs>
-        <linearGradient :id="gradientId" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" :style="`stop-color:${strokeColor};stop-opacity:0.3`" />
-          <stop offset="100%" :style="`stop-color:${strokeColor};stop-opacity:0.05`" />
+        <!-- Vertical gradient from red (bottom) to green (top) -->
+        <linearGradient :id="gradientId" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#ef4444" />   <!-- red-500: 0-70% -->
+          <stop offset="50%" stop-color="#eab308" />  <!-- yellow-500: 80% -->
+          <stop offset="100%" stop-color="#10b981" /> <!-- green-500: 100% -->
         </linearGradient>
       </defs>
 
-      <!-- Filled area under the line -->
-      <path
-        :d="areaPath"
-        :fill="`url(#${gradientId})`"
-      />
-
-      <!-- Line -->
+      <!-- Line with gradient stroke -->
       <path
         :d="graphPath"
         fill="none"
-        :stroke="strokeColor"
+        :stroke="`url(#${gradientId})`"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"

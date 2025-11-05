@@ -48,10 +48,10 @@
 
               <!-- Collection-level Sparkline -->
               <SparklineGraph
-                :attempts="getCollectionAttempts(collection.id)"
+                :sessions="collectionsStore.getCollectionSessions(collection.id)"
                 :width="120"
                 :height="30"
-                :show-min-attempts="5"
+                :show-min-sessions="1"
               />
             </div>
 
@@ -88,24 +88,13 @@
                 <span class="text-lg font-medium text-teal-900">
                   {{ word }}
                 </span>
-                <div class="flex items-center gap-3">
-                  <!-- Sparkline Graph -->
-                  <SparklineGraph
-                    :attempts="collectionsStore.getRecentAttempts(collection.id, word, 10)"
-                    :width="80"
-                    :height="24"
-                    :show-min-attempts="3"
-                  />
-                  <!-- Stats Badge -->
-                  <div
-                    :class="[
-                      'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm',
-                      getStatsBadgeColor(collection.id, word)
-                    ]"
-                  >
-                    {{ getWordAttempts(collection.id, word) }}
-                  </div>
-                </div>
+                <!-- Sparkline Graph -->
+                <SparklineGraph
+                  :sessions="collectionsStore.getRecentSessions(collection.id, word)"
+                  :width="80"
+                  :height="24"
+                  :show-min-sessions="1"
+                />
               </div>
             </div>
           </div>
@@ -179,31 +168,6 @@ const getTotalWords = (): number => {
   return collectionsStore.getWordsFromCollections(selectedCollections.value).length
 }
 
-const getWordAttempts = (collectionId: string, word: string): number => {
-  const stats = collectionsStore.getWordStats(collectionId, word)
-  if (!stats) return 0
-  return stats.correct + stats.incorrect
-}
-
-const getStatsBadgeColor = (collectionId: string, word: string): string => {
-  const stats = collectionsStore.getWordStats(collectionId, word)
-  if (!stats || (stats.correct + stats.incorrect) === 0) {
-    return 'bg-gray-400'
-  }
-
-  const percentage = collectionsStore.getWordPercentage(stats)
-
-  if (percentage >= 90) {
-    return 'bg-green-500'
-  } else if (percentage >= 80) {
-    return 'bg-yellow-500'
-  } else if (percentage >= 70) {
-    return 'bg-orange-500'
-  } else {
-    return 'bg-red-500'
-  }
-}
-
 const startPractice = () => {
   if (selectedCollections.value.length > 0) {
     router.push({
@@ -211,22 +175,5 @@ const startPractice = () => {
       query: { collections: selectedCollections.value.join(',') }
     })
   }
-}
-
-const getCollectionAttempts = (collectionId: string) => {
-  const collection = collectionsStore.getCollectionById(collectionId)
-  if (!collection || !collection.stats) return []
-
-  // Get all attempts across all words in the collection, sorted by timestamp
-  const allAttempts: any[] = []
-  collection.stats.forEach(stat => {
-    if (stat.attempts) {
-      allAttempts.push(...stat.attempts)
-    }
-  })
-
-  // Sort by timestamp and return last 10
-  allAttempts.sort((a, b) => a.timestamp - b.timestamp)
-  return allAttempts.slice(-10)
 }
 </script>

@@ -77,6 +77,9 @@ const totalWords = ref(0)
 const correctCount = ref(0)
 const selectedCollectionIds = ref<string[]>([])
 
+// Track session stats: key = "collectionId:word", value = { correct, attempted }
+const sessionStats = ref<Map<string, { correct: number; attempted: number }>>(new Map())
+
 const wordsRemaining = computed(() => {
   return queue.value.length - current.value
 })
@@ -143,8 +146,14 @@ const mark = (correct: boolean) => {
   const currentItem = queue.value[current.value]
   if (!currentItem) return // Safety check
 
-  // Record the attempt in the collection's stats
-  collectionsStore.recordWordAttempt(currentItem.collectionId, currentItem.word, correct)
+  // Track session stats for this word
+  const key = `${currentItem.collectionId}:${currentItem.word}`
+  const stats = sessionStats.value.get(key) || { correct: 0, attempted: 0 }
+  stats.attempted++
+  if (correct) {
+    stats.correct++
+  }
+  sessionStats.value.set(key, stats)
 
   if (correct) {
     // Increment correct count only when marked correct
@@ -159,7 +168,18 @@ const mark = (correct: boolean) => {
   // Check if we've gone through all words in the queue
   if (current.value >= queue.value.length) {
     finished.value = true
+    saveSessionData()
   }
+}
+
+const saveSessionData = () => {
+  // Save session data for each word
+  sessionStats.value.forEach((stats, key) => {
+    const [collectionId, word] = key.split(':')
+    if (collectionId && word) {
+      collectionsStore.recordWordSession(collectionId, word, stats.correct, stats.attempted)
+    }
+  })
 }
 
 const goBackToCollections = () => {
