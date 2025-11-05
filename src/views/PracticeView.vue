@@ -5,10 +5,10 @@
       <div v-if="!finished" class="text-center">
         <!-- Progress -->
         <div class="mb-8">
-          <p class="text-lg text-gray-600 dark:text-gray-400 mb-2">
+          <p class="text-lg text-gray-600 mb-2">
             {{ wordsRemaining }} word{{ wordsRemaining !== 1 ? 's' : '' }} remaining
           </p>
-          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div class="w-full bg-gray-200 rounded-full h-2">
             <div
               class="bg-blue-600 h-2 rounded-full transition-all duration-300"
               :style="{ width: `${progress}%` }"
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Current Word -->
-        <div class="bg-white dark:bg-gray-100 rounded-lg shadow-xl p-12 mb-8">
+        <div class="bg-white rounded-lg shadow-xl p-12 mb-8">
           <h1 class="text-7xl font-bold text-gray-900">{{ queue[current] }}</h1>
         </div>
 
@@ -37,14 +37,14 @@
           </button>
         </div>
 
-        <p class="mt-6 text-gray-600 dark:text-gray-400">
+        <p class="mt-6 text-gray-600">
           Mark ✓ if correct, ✗ to practice again
         </p>
       </div>
 
       <!-- Completion Screen -->
       <div v-else class="text-center">
-        <div class="bg-white dark:bg-gray-100 rounded-lg shadow-xl p-12">
+        <div class="bg-white rounded-lg shadow-xl p-12">
           <h1 class="text-5xl font-bold mb-4 text-gray-900">Yay! 🎉</h1>
           <p class="text-xl text-gray-700 mb-8">
             You've completed all {{ totalWords }} words!

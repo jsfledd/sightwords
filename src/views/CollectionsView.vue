@@ -21,7 +21,7 @@
         <div
           v-for="collection in collectionsStore.collections"
           :key="collection.id"
-          class="bg-white dark:bg-gray-200 rounded-lg shadow-md p-6"
+          class="bg-white rounded-lg shadow-md p-6"
         >
           <!-- Collection Header -->
           <div class="flex items-center gap-4 mb-3">
@@ -46,13 +46,13 @@
             <!-- Action Buttons -->
             <button
               @click="navigateToEdit(collection.id)"
-              class="text-blue-600 hover:text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
+              class="text-blue-600 hover:text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 transition-colors"
             >
               Edit
             </button>
             <button
               @click="confirmDelete(collection.id, collection.name)"
-              class="text-red-600 hover:text-red-700 font-medium px-3 py-1 rounded hover:bg-red-50 dark:hover:bg-gray-700 transition-colors"
+              class="text-red-600 hover:text-red-700 font-medium px-3 py-1 rounded hover:bg-red-50 transition-colors"
             >
               Delete
             </button>
@@ -61,13 +61,13 @@
           <!-- Expanded Word List -->
           <div
             v-if="expandedCollections.has(collection.id)"
-            class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+            class="mt-4 pt-4 border-t border-gray-200"
           >
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="(word, index) in collection.words"
                 :key="index"
-                class="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full text-sm"
+                class="bg-gray-100 px-3 py-1 rounded-full text-sm"
               >
                 {{ word }}
               </span>
@@ -85,7 +85,7 @@
             'font-semibold py-3 px-8 rounded-lg text-lg transition-all',
             selectedCollections.length > 0
               ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
-              : 'bg-gray-300 dark:bg-gray-400 text-gray-500 cursor-not-allowed'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           ]"
         >
           Start Practice
