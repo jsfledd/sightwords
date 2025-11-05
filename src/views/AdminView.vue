@@ -59,25 +59,14 @@
             class="bg-white rounded-3xl shadow-lg p-6 border-2 border-teal-100"
           >
             <!-- Collection Header -->
-            <div class="flex flex-col gap-4 mb-4">
-              <div class="w-full">
-                <label class="block text-sm font-semibold text-gray-600 mb-1">Collection ID</label>
-                <input
-                  v-model="collection.id"
-                  type="text"
-                  class="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:outline-none"
-                  placeholder="unique-id"
-                />
-              </div>
-              <div class="w-full">
-                <label class="block text-sm font-semibold text-gray-600 mb-1">Collection Name</label>
-                <input
-                  v-model="collection.name"
-                  type="text"
-                  class="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:outline-none"
-                  placeholder="Collection Name"
-                />
-              </div>
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-gray-600 mb-1">Collection Name</label>
+              <input
+                v-model="collection.name"
+                type="text"
+                class="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:outline-none"
+                placeholder="Collection Name"
+              />
             </div>
 
             <!-- Words -->
@@ -194,9 +183,9 @@ const deleteCollection = (index: number) => {
 }
 
 const saveToJson = () => {
-  // Prepare data for download
+  // Prepare data for download - generate IDs from names
   const dataToSave = defaultCollections.value.map(col => ({
-    id: col.id,
+    id: col.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
     name: col.name,
     words: col.words
   }))
