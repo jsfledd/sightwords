@@ -142,7 +142,8 @@ const loadFromJson = async () => {
   successMessage.value = null
 
   try {
-    const response = await fetch('/default-collections.json')
+    const baseUrl = import.meta.env.BASE_URL || '/'
+    const response = await fetch(`${baseUrl}default-collections.json`)
     if (!response.ok) {
       throw new Error(`Failed to load: ${response.statusText}`)
     }
