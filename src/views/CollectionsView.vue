@@ -17,12 +17,6 @@
           >
             Load Defaults
           </button>
-          <button
-            @click="navigateToAdmin"
-            class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all hover:shadow-xl"
-          >
-            Admin
-          </button>
         </div>
       </div>
     </div>
@@ -165,10 +159,6 @@ const navigateToCreate = () => {
 
 const navigateToEdit = (id: string) => {
   router.push(`/collection/${id}/edit`)
-}
-
-const navigateToAdmin = () => {
-  router.push('/admin')
 }
 
 const loadDefaults = async () => {

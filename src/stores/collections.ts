@@ -21,6 +21,7 @@ export interface Collection {
 }
 
 const STORAGE_KEY = 'flashcards-collections'
+const DEFAULTS_LOADED_KEY = 'flashcards-defaults-loaded'
 
 export const useCollectionsStore = defineStore('collections', () => {
   const collections = ref<Collection[]>([])
@@ -48,6 +49,8 @@ export const useCollectionsStore = defineStore('collections', () => {
         }
       })
 
+      // Mark that defaults have been loaded
+      localStorage.setItem(DEFAULTS_LOADED_KEY, 'true')
       saveToLocalStorage()
     } catch (error) {
       console.error('Error loading default collections:', error)
@@ -55,14 +58,20 @@ export const useCollectionsStore = defineStore('collections', () => {
   }
 
   // Load collections from localStorage
-  const loadFromLocalStorage = () => {
+  const loadFromLocalStorage = async () => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
+      const defaultsLoaded = localStorage.getItem(DEFAULTS_LOADED_KEY)
+
       if (stored) {
         collections.value = JSON.parse(stored)
       } else {
-        // Initialize with empty array, will load defaults separately
         collections.value = []
+      }
+
+      // Load defaults on first initialization
+      if (!defaultsLoaded) {
+        await loadDefaultCollections()
       }
     } catch (error) {
       console.error('Error loading collections from localStorage:', error)
