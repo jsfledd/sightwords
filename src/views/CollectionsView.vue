@@ -4,20 +4,12 @@
     <div class="w-full bg-white border-b-4 border-teal-200 py-6 mb-8 shadow-md">
       <div class="text-center">
         <h1 class="text-5xl font-bold mb-4 text-teal-700">Sight Words</h1>
-        <div class="flex gap-3 justify-center flex-wrap">
-          <button
-            @click="navigateToCreate"
-            class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all hover:shadow-xl"
-          >
-            Add New Collection
-          </button>
-          <button
-            @click="loadDefaults"
-            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all hover:shadow-xl"
-          >
-            Load Defaults
-          </button>
-        </div>
+        <button
+          @click="navigateToCreate"
+          class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all hover:shadow-xl"
+        >
+          Add New Collection
+        </button>
       </div>
     </div>
 
@@ -159,10 +151,6 @@ const navigateToCreate = () => {
 
 const navigateToEdit = (id: string) => {
   router.push(`/collection/${id}/edit`)
-}
-
-const loadDefaults = async () => {
-  await collectionsStore.loadDefaultCollections()
 }
 
 const toggleExpanded = (id: string) => {
