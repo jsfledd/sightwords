@@ -118,18 +118,23 @@ const shuffle = (arr: string[]): string[] => {
   const shuffled = [...arr]
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    const temp = shuffled[i]
+    shuffled[i] = shuffled[j]!
+    shuffled[j] = temp!
   }
   return shuffled
 }
 
 const mark = (correct: boolean) => {
+  const currentWord = queue.value[current.value]
+  if (!currentWord) return // Safety check
+
   if (correct) {
     // Increment correct count only when marked correct
     correctCount.value++
   } else {
     // If incorrect, add word back to the end of queue
-    queue.value.push(queue.value[current.value])
+    queue.value.push(currentWord)
   }
 
   current.value++
