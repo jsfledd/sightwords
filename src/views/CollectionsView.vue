@@ -23,41 +23,44 @@
         <div
           v-for="collection in collectionsStore.collections"
           :key="collection.id"
-          class="bg-white rounded-3xl shadow-lg p-6 border-2 border-teal-100"
+          class="bg-white rounded-3xl shadow-lg p-3 border-2 border-teal-100"
         >
           <!-- Collection Header -->
-          <div class="flex items-center gap-4 mb-3">
+          <div class="flex gap-4 items-center mb-3">
             <!-- Checkbox -->
             <input
               type="checkbox"
               :id="`collection-${collection.id}`"
               v-model="selectedCollections"
               :value="collection.id"
-              class="w-6 h-6 text-teal-500 rounded-lg focus:ring-2 focus:ring-teal-400"
+              class="w-6 h-6 text-teal-500 rounded-lg focus:ring-2 focus:ring-teal-400 flex-shrink-0"
             />
 
-            <!-- Collection Name (Accordion Toggle) -->
+            <!-- Collection Name (Accordion Toggle) - Takes maximum space -->
             <button
               @click="toggleExpanded(collection.id)"
               class="flex-1 text-left text-xl font-bold hover:text-teal-600 transition-colors text-gray-800"
             >
-              {{ collection.name }}
-              <span class="text-sm text-gray-500 ml-2 font-normal">({{ collection.words.length }} words)</span>
+              {{ collection.name }} ({{ collection.words.length }})
             </button>
 
             <!-- Action Buttons -->
-            <button
-              @click="navigateToEdit(collection.id)"
-              class="text-teal-600 hover:text-teal-700 font-semibold px-4 py-2 rounded-full hover:bg-teal-50 transition-colors"
-            >
-              Edit
-            </button>
-            <button
-              @click="confirmDelete(collection.id, collection.name)"
-              class="text-orange-600 hover:text-orange-700 font-semibold px-4 py-2 rounded-full hover:bg-orange-50 transition-colors"
-            >
-              Delete
-            </button>
+            <div class="flex flex-col gap-1 items-center flex-shrink-0">
+              <button
+                @click="navigateToEdit(collection.id)"
+                class="text-teal-600 hover:text-teal-700 font-semibold px-2 py-2 rounded-full hover:bg-teal-50 transition-colors"
+                title="Edit"
+              >
+                ⚙️
+              </button>
+              <button
+                @click="confirmDelete(collection.id, collection.name)"
+                class="text-orange-600 hover:text-orange-700 font-semibold px-2 py-2 rounded-full hover:bg-orange-50 transition-colors"
+                title="Delete"
+              >
+                🗑️
+              </button>
+            </div>
           </div>
 
           <!-- Expanded Word List -->
