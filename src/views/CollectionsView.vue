@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen py-8 px-4">
-    <div class="max-w-4xl mx-auto">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-4 text-teal-700">Sight Word Collections</h1>
+  <div class="min-h-screen">
+    <!-- Header -->
+    <div class="w-full bg-white border-b-4 border-teal-200 py-6 mb-8 shadow-md">
+      <div class="text-center">
+        <h1 class="text-5xl font-bold mb-4 text-teal-700">Sight Words</h1>
         <button
           @click="navigateToCreate"
           class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all hover:shadow-xl"
@@ -11,7 +11,9 @@
           Add New Collection
         </button>
       </div>
+    </div>
 
+    <div class="max-w-4xl mx-auto px-4">
       <!-- Collections List -->
       <div v-if="collectionsStore.collections.length === 0" class="text-center py-12 text-gray-500">
         <p class="text-xl">No collections yet. Create your first collection!</p>
