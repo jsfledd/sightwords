@@ -36,13 +36,24 @@
               class="w-6 h-6 text-teal-500 rounded-lg focus:ring-2 focus:ring-teal-400 flex-shrink-0"
             />
 
-            <!-- Collection Name (Accordion Toggle) - Takes maximum space -->
-            <button
-              @click="toggleExpanded(collection.id)"
-              class="flex-1 text-left text-xl font-bold hover:text-teal-600 transition-colors text-gray-800"
-            >
-              {{ collection.name }} ({{ collection.words.length }})
-            </button>
+            <!-- Collection Name and Graph Container -->
+            <div class="flex-1 flex items-center gap-4">
+              <!-- Collection Name (Accordion Toggle) -->
+              <button
+                @click="toggleExpanded(collection.id)"
+                class="text-left text-xl font-bold hover:text-teal-600 transition-colors text-gray-800"
+              >
+                {{ collection.name }} ({{ collection.words.length }})
+              </button>
+
+              <!-- Collection-level Sparkline -->
+              <SparklineGraph
+                :attempts="getCollectionAttempts(collection.id)"
+                :width="120"
+                :height="30"
+                :show-min-attempts="5"
+              />
+            </div>
 
             <!-- Action Buttons -->
             <div class="flex flex-col gap-1 items-center flex-shrink-0">
@@ -77,13 +88,23 @@
                 <span class="text-lg font-medium text-teal-900">
                   {{ word }}
                 </span>
-                <div
-                  :class="[
-                    'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm',
-                    getStatsBadgeColor(collection.id, word)
-                  ]"
-                >
-                  {{ getWordAttempts(collection.id, word) }}
+                <div class="flex items-center gap-3">
+                  <!-- Sparkline Graph -->
+                  <SparklineGraph
+                    :attempts="collectionsStore.getRecentAttempts(collection.id, word, 10)"
+                    :width="80"
+                    :height="24"
+                    :show-min-attempts="3"
+                  />
+                  <!-- Stats Badge -->
+                  <div
+                    :class="[
+                      'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm',
+                      getStatsBadgeColor(collection.id, word)
+                    ]"
+                  >
+                    {{ getWordAttempts(collection.id, word) }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -117,6 +138,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCollectionsStore } from '../stores/collections'
+import SparklineGraph from '../components/SparklineGraph.vue'
 
 const router = useRouter()
 const collectionsStore = useCollectionsStore()
@@ -189,5 +211,22 @@ const startPractice = () => {
       query: { collections: selectedCollections.value.join(',') }
     })
   }
+}
+
+const getCollectionAttempts = (collectionId: string) => {
+  const collection = collectionsStore.getCollectionById(collectionId)
+  if (!collection || !collection.stats) return []
+
+  // Get all attempts across all words in the collection, sorted by timestamp
+  const allAttempts: any[] = []
+  collection.stats.forEach(stat => {
+    if (stat.attempts) {
+      allAttempts.push(...stat.attempts)
+    }
+  })
+
+  // Sort by timestamp and return last 10
+  allAttempts.sort((a, b) => a.timestamp - b.timestamp)
+  return allAttempts.slice(-10)
 }
 </script>

@@ -1,10 +1,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+export interface AttemptRecord {
+  timestamp: number // Unix timestamp in milliseconds
+  correct: boolean
+}
+
 export interface WordStats {
   word: string
   correct: number
   incorrect: number
+  attempts?: AttemptRecord[] // Historical log of attempts
 }
 
 export interface Collection {
@@ -134,7 +140,8 @@ export const useCollectionsStore = defineStore('collections', () => {
       collection.stats = collection.words.map(w => ({
         word: w,
         correct: 0,
-        incorrect: 0
+        incorrect: 0,
+        attempts: []
       }))
     }
 
@@ -142,8 +149,25 @@ export const useCollectionsStore = defineStore('collections', () => {
     let wordStats = collection.stats.find(s => s.word === word)
     if (!wordStats) {
       // Word not in stats yet, add it
-      wordStats = { word, correct: 0, incorrect: 0 }
+      wordStats = { word, correct: 0, incorrect: 0, attempts: [] }
       collection.stats.push(wordStats)
+    }
+
+    // Initialize attempts array if it doesn't exist (migration support)
+    if (!wordStats.attempts) {
+      wordStats.attempts = []
+    }
+
+    // Create attempt record
+    const attempt: AttemptRecord = {
+      timestamp: Date.now(),
+      correct
+    }
+
+    // Add to attempts history (keep last 20 attempts to manage storage)
+    wordStats.attempts.push(attempt)
+    if (wordStats.attempts.length > 20) {
+      wordStats.attempts.shift() // Remove oldest
     }
 
     // Update the count
@@ -170,6 +194,48 @@ export const useCollectionsStore = defineStore('collections', () => {
     return Math.round((stats.correct / total) * 100)
   }
 
+  // Get recent attempts for graphing (last N attempts)
+  const getRecentAttempts = (collectionId: string, word: string, limit: number = 10): AttemptRecord[] => {
+    const stats = getWordStats(collectionId, word)
+    if (!stats || !stats.attempts || stats.attempts.length === 0) {
+      return []
+    }
+    // Return last N attempts
+    return stats.attempts.slice(-limit)
+  }
+
+  // Get collection-wide accuracy trend (average of all words' recent attempts)
+  const getCollectionTrend = (collectionId: string, limit: number = 10): number[] => {
+    const collection = getCollectionById(collectionId)
+    if (!collection || !collection.stats) return []
+
+    // Get all attempts across all words, sorted by timestamp
+    const allAttempts: AttemptRecord[] = []
+    collection.stats.forEach(stat => {
+      if (stat.attempts) {
+        allAttempts.push(...stat.attempts)
+      }
+    })
+
+    if (allAttempts.length === 0) return []
+
+    // Sort by timestamp
+    allAttempts.sort((a, b) => a.timestamp - b.timestamp)
+
+    // Take last N attempts
+    const recentAttempts = allAttempts.slice(-limit)
+
+    // Calculate rolling accuracy for each point
+    const trend: number[] = []
+    for (let i = 0; i < recentAttempts.length; i++) {
+      const correctCount = recentAttempts.slice(0, i + 1).filter(a => a.correct).length
+      const accuracy = (correctCount / (i + 1)) * 100
+      trend.push(accuracy)
+    }
+
+    return trend
+  }
+
   return {
     collections,
     loadFromLocalStorage,
@@ -182,6 +248,8 @@ export const useCollectionsStore = defineStore('collections', () => {
     initializeStats,
     recordWordAttempt,
     getWordStats,
-    getWordPercentage
+    getWordPercentage,
+    getRecentAttempts,
+    getCollectionTrend
   }
 })
