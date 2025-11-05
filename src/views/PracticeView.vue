@@ -18,7 +18,7 @@
 
         <!-- Current Word -->
         <div class="bg-white rounded-3xl shadow-2xl p-16 mb-10 border-4 border-teal-200">
-          <h1 class="text-8xl font-bold text-teal-800">{{ queue[current] }}</h1>
+          <h1 class="text-8xl font-bold text-teal-800">{{ queue[current]?.word }}</h1>
         </div>
 
         <!-- Action Buttons -->
@@ -70,11 +70,12 @@ const router = useRouter()
 const route = useRoute()
 const collectionsStore = useCollectionsStore()
 
-const queue = ref<string[]>([])
+const queue = ref<{ word: string; collectionId: string }[]>([])
 const current = ref(0)
 const finished = ref(false)
 const totalWords = ref(0)
 const correctCount = ref(0)
+const selectedCollectionIds = ref<string[]>([])
 
 const wordsRemaining = computed(() => {
   return queue.value.length - current.value
@@ -98,23 +99,36 @@ const initializePractice = () => {
   }
 
   const collectionIds = collectionsParam.split(',')
-  const words = collectionsStore.getWordsFromCollections(collectionIds)
+  selectedCollectionIds.value = collectionIds
 
-  if (words.length === 0) {
+  // Build queue with word-collection pairs
+  const wordPairs: { word: string; collectionId: string }[] = []
+  collectionIds.forEach(id => {
+    const collection = collectionsStore.getCollectionById(id)
+    if (collection) {
+      // Initialize stats for this collection if needed
+      collectionsStore.initializeStats(id)
+      collection.words.forEach(word => {
+        wordPairs.push({ word, collectionId: id })
+      })
+    }
+  })
+
+  if (wordPairs.length === 0) {
     alert('No words found in selected collections')
     router.push('/')
     return
   }
 
   // Shuffle and initialize queue
-  queue.value = shuffle([...words])
+  queue.value = shuffle([...wordPairs])
   totalWords.value = queue.value.length
   current.value = 0
   correctCount.value = 0
   finished.value = false
 }
 
-const shuffle = (arr: string[]): string[] => {
+const shuffle = <T>(arr: T[]): T[] => {
   const shuffled = [...arr]
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
@@ -126,15 +140,18 @@ const shuffle = (arr: string[]): string[] => {
 }
 
 const mark = (correct: boolean) => {
-  const currentWord = queue.value[current.value]
-  if (!currentWord) return // Safety check
+  const currentItem = queue.value[current.value]
+  if (!currentItem) return // Safety check
+
+  // Record the attempt in the collection's stats
+  collectionsStore.recordWordAttempt(currentItem.collectionId, currentItem.word, correct)
 
   if (correct) {
     // Increment correct count only when marked correct
     correctCount.value++
   } else {
     // If incorrect, add word back to the end of queue
-    queue.value.push(currentWord)
+    queue.value.push(currentItem)
   }
 
   current.value++

@@ -63,14 +63,24 @@
             v-if="expandedCollections.has(collection.id)"
             class="mt-4 pt-4 border-t-2 border-teal-100"
           >
-            <div class="flex flex-wrap gap-3">
-              <span
+            <div class="space-y-2">
+              <div
                 v-for="(word, index) in collection.words"
                 :key="index"
-                class="bg-teal-50 text-teal-800 px-4 py-2 rounded-full text-base font-medium"
+                class="flex items-center justify-between bg-teal-50 px-4 py-3 rounded-2xl"
               >
-                {{ word }}
-              </span>
+                <span class="text-lg font-medium text-teal-900">
+                  {{ word }}
+                </span>
+                <div
+                  :class="[
+                    'w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm',
+                    getStatsBadgeColor(collection.id, word)
+                  ]"
+                >
+                  {{ getWordAttempts(collection.id, word) }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -140,6 +150,31 @@ const confirmDelete = (id: string, name: string) => {
 
 const getTotalWords = (): number => {
   return collectionsStore.getWordsFromCollections(selectedCollections.value).length
+}
+
+const getWordAttempts = (collectionId: string, word: string): number => {
+  const stats = collectionsStore.getWordStats(collectionId, word)
+  if (!stats) return 0
+  return stats.correct + stats.incorrect
+}
+
+const getStatsBadgeColor = (collectionId: string, word: string): string => {
+  const stats = collectionsStore.getWordStats(collectionId, word)
+  if (!stats || (stats.correct + stats.incorrect) === 0) {
+    return 'bg-gray-400'
+  }
+
+  const percentage = collectionsStore.getWordPercentage(stats)
+
+  if (percentage >= 90) {
+    return 'bg-green-500'
+  } else if (percentage >= 80) {
+    return 'bg-yellow-500'
+  } else if (percentage >= 70) {
+    return 'bg-orange-500'
+  } else {
+    return 'bg-red-500'
+  }
 }
 
 const startPractice = () => {

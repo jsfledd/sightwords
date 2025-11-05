@@ -1,10 +1,17 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
+export interface WordStats {
+  word: string
+  correct: number
+  incorrect: number
+}
+
 export interface Collection {
   id: string
   name: string
   words: string[]
+  stats?: WordStats[]
 }
 
 const STORAGE_KEY = 'flashcards-collections'
@@ -104,6 +111,65 @@ export const useCollectionsStore = defineStore('collections', () => {
     return allWords
   }
 
+  // Initialize stats for a collection if they don't exist
+  const initializeStats = (collectionId: string) => {
+    const collection = getCollectionById(collectionId)
+    if (collection && !collection.stats) {
+      collection.stats = collection.words.map(word => ({
+        word,
+        correct: 0,
+        incorrect: 0
+      }))
+      saveToLocalStorage()
+    }
+  }
+
+  // Record a word attempt
+  const recordWordAttempt = (collectionId: string, word: string, correct: boolean) => {
+    const collection = getCollectionById(collectionId)
+    if (!collection) return
+
+    // Initialize stats if needed
+    if (!collection.stats) {
+      collection.stats = collection.words.map(w => ({
+        word: w,
+        correct: 0,
+        incorrect: 0
+      }))
+    }
+
+    // Find the word's stats
+    let wordStats = collection.stats.find(s => s.word === word)
+    if (!wordStats) {
+      // Word not in stats yet, add it
+      wordStats = { word, correct: 0, incorrect: 0 }
+      collection.stats.push(wordStats)
+    }
+
+    // Update the count
+    if (correct) {
+      wordStats.correct++
+    } else {
+      wordStats.incorrect++
+    }
+
+    saveToLocalStorage()
+  }
+
+  // Get stats for a specific word in a collection
+  const getWordStats = (collectionId: string, word: string): WordStats | undefined => {
+    const collection = getCollectionById(collectionId)
+    if (!collection || !collection.stats) return undefined
+    return collection.stats.find(s => s.word === word)
+  }
+
+  // Calculate percentage correct for a word
+  const getWordPercentage = (stats: WordStats): number => {
+    const total = stats.correct + stats.incorrect
+    if (total === 0) return 0
+    return Math.round((stats.correct / total) * 100)
+  }
+
   return {
     collections,
     loadFromLocalStorage,
@@ -112,6 +178,10 @@ export const useCollectionsStore = defineStore('collections', () => {
     updateCollection,
     deleteCollection,
     getCollectionById,
-    getWordsFromCollections
+    getWordsFromCollections,
+    initializeStats,
+    recordWordAttempt,
+    getWordStats,
+    getWordPercentage
   }
 })
