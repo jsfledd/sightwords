@@ -5,53 +5,53 @@
       <div v-if="!finished" class="text-center">
         <!-- Progress -->
         <div class="mb-8">
-          <p class="text-lg text-gray-600 mb-2">
+          <p class="text-xl text-teal-700 mb-3 font-bold">
             {{ wordsRemaining }} word{{ wordsRemaining !== 1 ? 's' : '' }} remaining
           </p>
-          <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="w-full bg-gray-200 rounded-full h-4 shadow-inner">
             <div
-              class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              class="bg-gradient-to-r from-teal-400 to-teal-600 h-4 rounded-full transition-all duration-500"
               :style="{ width: `${progress}%` }"
             ></div>
           </div>
         </div>
 
         <!-- Current Word -->
-        <div class="bg-white rounded-lg shadow-xl p-12 mb-8">
-          <h1 class="text-7xl font-bold text-gray-900">{{ queue[current] }}</h1>
+        <div class="bg-white rounded-3xl shadow-2xl p-16 mb-10 border-4 border-teal-200">
+          <h1 class="text-8xl font-bold text-teal-800">{{ queue[current] }}</h1>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-4 justify-center">
+        <div class="flex gap-6 justify-center">
           <button
             @click="mark(false)"
-            class="bg-red-600 hover:bg-red-700 text-white font-bold py-6 px-12 rounded-lg text-2xl transition-colors"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-8 px-16 rounded-full text-3xl transition-all shadow-xl hover:shadow-2xl hover:scale-110"
           >
             ✗
           </button>
           <button
             @click="mark(true)"
-            class="bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-12 rounded-lg text-2xl transition-colors"
+            class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-8 px-16 rounded-full text-3xl transition-all shadow-xl hover:shadow-2xl hover:scale-110"
           >
             ✓
           </button>
         </div>
 
-        <p class="mt-6 text-gray-600">
+        <p class="mt-8 text-gray-600 text-lg font-medium">
           Mark ✓ if correct, ✗ to practice again
         </p>
       </div>
 
       <!-- Completion Screen -->
       <div v-else class="text-center">
-        <div class="bg-white rounded-lg shadow-xl p-12">
-          <h1 class="text-5xl font-bold mb-4 text-gray-900">Yay! 🎉</h1>
-          <p class="text-xl text-gray-700 mb-8">
+        <div class="bg-white rounded-3xl shadow-2xl p-16 border-4 border-orange-200">
+          <h1 class="text-6xl font-bold mb-6 text-teal-700">Yay! 🎉</h1>
+          <p class="text-2xl text-gray-700 mb-10 font-medium">
             You've completed all {{ totalWords }} words!
           </p>
           <button
             @click="goBackToCollections"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition-colors"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-12 rounded-full text-xl transition-all shadow-lg hover:shadow-xl hover:scale-105"
           >
             Back to Collections
           </button>

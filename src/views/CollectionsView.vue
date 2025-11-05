@@ -3,10 +3,10 @@
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-4">Sight Word Collections</h1>
+        <h1 class="text-4xl font-bold mb-4 text-teal-700">Sight Word Collections</h1>
         <button
           @click="navigateToCreate"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+          class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all hover:shadow-xl"
         >
           Add New Collection
         </button>
@@ -21,7 +21,7 @@
         <div
           v-for="collection in collectionsStore.collections"
           :key="collection.id"
-          class="bg-white rounded-lg shadow-md p-6"
+          class="bg-white rounded-3xl shadow-lg p-6 border-2 border-teal-100"
         >
           <!-- Collection Header -->
           <div class="flex items-center gap-4 mb-3">
@@ -31,28 +31,28 @@
               :id="`collection-${collection.id}`"
               v-model="selectedCollections"
               :value="collection.id"
-              class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+              class="w-6 h-6 text-teal-500 rounded-lg focus:ring-2 focus:ring-teal-400"
             />
 
             <!-- Collection Name (Accordion Toggle) -->
             <button
               @click="toggleExpanded(collection.id)"
-              class="flex-1 text-left text-xl font-semibold hover:text-blue-600 transition-colors"
+              class="flex-1 text-left text-xl font-bold hover:text-teal-600 transition-colors text-gray-800"
             >
               {{ collection.name }}
-              <span class="text-sm text-gray-500 ml-2">({{ collection.words.length }} words)</span>
+              <span class="text-sm text-gray-500 ml-2 font-normal">({{ collection.words.length }} words)</span>
             </button>
 
             <!-- Action Buttons -->
             <button
               @click="navigateToEdit(collection.id)"
-              class="text-blue-600 hover:text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 transition-colors"
+              class="text-teal-600 hover:text-teal-700 font-semibold px-4 py-2 rounded-full hover:bg-teal-50 transition-colors"
             >
               Edit
             </button>
             <button
               @click="confirmDelete(collection.id, collection.name)"
-              class="text-red-600 hover:text-red-700 font-medium px-3 py-1 rounded hover:bg-red-50 transition-colors"
+              class="text-orange-600 hover:text-orange-700 font-semibold px-4 py-2 rounded-full hover:bg-orange-50 transition-colors"
             >
               Delete
             </button>
@@ -61,13 +61,13 @@
           <!-- Expanded Word List -->
           <div
             v-if="expandedCollections.has(collection.id)"
-            class="mt-4 pt-4 border-t border-gray-200"
+            class="mt-4 pt-4 border-t-2 border-teal-100"
           >
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-3">
               <span
                 v-for="(word, index) in collection.words"
                 :key="index"
-                class="bg-gray-100 px-3 py-1 rounded-full text-sm"
+                class="bg-teal-50 text-teal-800 px-4 py-2 rounded-full text-base font-medium"
               >
                 {{ word }}
               </span>
@@ -82,14 +82,14 @@
           @click="startPractice"
           :disabled="selectedCollections.length === 0"
           :class="[
-            'font-semibold py-3 px-8 rounded-lg text-lg transition-all',
+            'font-bold py-4 px-12 rounded-full text-xl transition-all shadow-lg',
             selectedCollections.length > 0
-              ? 'bg-green-600 hover:bg-green-700 text-white cursor-pointer'
+              ? 'bg-orange-500 hover:bg-orange-600 text-white cursor-pointer hover:shadow-xl hover:scale-105'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           ]"
         >
           Start Practice
-          <span v-if="selectedCollections.length > 0" class="text-sm ml-2">
+          <span v-if="selectedCollections.length > 0" class="text-base ml-2">
             ({{ getTotalWords() }} words)
           </span>
         </button>

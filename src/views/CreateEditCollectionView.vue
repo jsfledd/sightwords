@@ -5,20 +5,20 @@
       <div class="mb-8">
         <button
           @click="goBack"
-          class="text-blue-600 hover:text-blue-700 font-medium mb-4 inline-flex items-center"
+          class="text-teal-600 hover:text-teal-700 font-semibold mb-4 inline-flex items-center px-4 py-2 rounded-full hover:bg-teal-50 transition-colors"
         >
-          <span class="mr-2">←</span> Back to Collections
+          <span class="mr-2 text-xl">←</span> Back to Collections
         </button>
-        <h1 class="text-4xl font-bold">
+        <h1 class="text-4xl font-bold text-teal-700">
           {{ isEditMode ? 'Edit Collection' : 'Create New Collection' }}
         </h1>
       </div>
 
       <!-- Form -->
-      <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="bg-white rounded-3xl shadow-lg p-8 border-2 border-teal-100">
         <!-- Collection Name -->
         <div class="mb-6">
-          <label for="collection-name" class="block text-sm font-semibold mb-2">
+          <label for="collection-name" class="block text-base font-bold mb-2 text-gray-700">
             Collection Name
           </label>
           <input
@@ -26,15 +26,15 @@
             v-model="collectionName"
             type="text"
             placeholder="e.g., First Grade Words"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            class="w-full px-5 py-3 border-2 border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-white text-lg"
             @keyup.enter="focusWordsTextarea"
           />
-          <p v-if="errors.name" class="text-red-600 text-sm mt-1">{{ errors.name }}</p>
+          <p v-if="errors.name" class="text-orange-600 text-sm mt-1 font-medium">{{ errors.name }}</p>
         </div>
 
         <!-- Words Input -->
         <div class="mb-6">
-          <label for="words-input" class="block text-sm font-semibold mb-2">
+          <label for="words-input" class="block text-base font-bold mb-2 text-gray-700">
             Sight Words (one per line)
           </label>
           <textarea
@@ -43,10 +43,10 @@
             v-model="wordsText"
             rows="15"
             placeholder="Enter sight words, one per line&#10;&#10;Example:&#10;we&#10;see&#10;my&#10;he"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono bg-white"
+            class="w-full px-5 py-3 border-2 border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 font-mono bg-white text-lg"
           ></textarea>
-          <p v-if="errors.words" class="text-red-600 text-sm mt-1">{{ errors.words }}</p>
-          <p class="text-gray-500 text-sm mt-2">
+          <p v-if="errors.words" class="text-orange-600 text-sm mt-1 font-medium">{{ errors.words }}</p>
+          <p class="text-gray-600 text-sm mt-2 font-medium">
             {{ wordCount }} word{{ wordCount !== 1 ? 's' : '' }}
           </p>
         </div>
@@ -55,13 +55,13 @@
         <div class="flex gap-4">
           <button
             @click="saveCollection"
-            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-6 rounded-full transition-all shadow-lg hover:shadow-xl hover:scale-105"
           >
             {{ isEditMode ? 'Save Changes' : 'Create Collection' }}
           </button>
           <button
             @click="goBack"
-            class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors"
+            class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-4 px-6 rounded-full transition-all"
           >
             Cancel
           </button>
