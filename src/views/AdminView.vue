@@ -30,22 +30,22 @@
       <!-- Collections Editor -->
       <div v-else>
         <!-- Action Buttons -->
-        <div class="flex gap-4 mb-6">
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
           <button
             @click="loadFromJson"
-            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
           >
-            Reload from JSON
+            Reload from file
           </button>
           <button
             @click="saveToJson"
-            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all"
+            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
           >
-            Save to JSON
+            Save to file
           </button>
           <button
             @click="addNewCollection"
-            class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all"
+            class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
           >
             Add Collection
           </button>
@@ -59,8 +59,8 @@
             class="bg-white rounded-3xl shadow-lg p-6 border-2 border-teal-100"
           >
             <!-- Collection Header -->
-            <div class="flex items-center gap-4 mb-4">
-              <div class="flex-1">
+            <div class="flex flex-col gap-4 mb-4">
+              <div class="w-full">
                 <label class="block text-sm font-semibold text-gray-600 mb-1">Collection ID</label>
                 <input
                   v-model="collection.id"
@@ -69,7 +69,7 @@
                   placeholder="unique-id"
                 />
               </div>
-              <div class="flex-1">
+              <div class="w-full">
                 <label class="block text-sm font-semibold text-gray-600 mb-1">Collection Name</label>
                 <input
                   v-model="collection.name"
@@ -78,31 +78,33 @@
                   placeholder="Collection Name"
                 />
               </div>
-              <button
-                @click="deleteCollection(index)"
-                class="mt-6 text-red-600 hover:text-red-700 font-semibold px-4 py-2 rounded-full hover:bg-red-50 transition-colors"
-                title="Delete Collection"
-              >
-                🗑️ Delete
-              </button>
             </div>
 
             <!-- Words -->
-            <div>
+            <div class="mb-4">
               <label class="block text-sm font-semibold text-gray-600 mb-2">
                 Words ({{ collection.words.length }})
               </label>
               <textarea
                 v-model="collection.wordsText"
                 @input="updateWords(collection)"
-                rows="4"
+                rows="6"
                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:outline-none font-mono text-sm"
-                placeholder="Enter words separated by commas, spaces, or new lines"
+                :placeholder="index === 0 ? 'CSV format: cat, dog, bird, fish, rabbit' : 'One per line:\ncat\ndog\nbird\nfish\nrabbit'"
               ></textarea>
               <p class="text-xs text-gray-500 mt-1">
-                Separate words with commas, spaces, or new lines. They will be automatically cleaned up.
+                Supports CSV format (comma-separated) or one word per line. Words are automatically cleaned up.
               </p>
             </div>
+
+            <!-- Delete Button -->
+            <button
+              @click="deleteCollection(index)"
+              class="w-full text-red-600 hover:text-red-700 font-semibold py-2 px-4 rounded-full hover:bg-red-50 transition-colors border-2 border-red-200"
+              title="Delete Collection"
+            >
+              🗑️ Delete Collection
+            </button>
           </div>
         </div>
 
