@@ -25,6 +25,34 @@ const STORAGE_KEY = 'flashcards-collections'
 export const useCollectionsStore = defineStore('collections', () => {
   const collections = ref<Collection[]>([])
 
+  // Load default collections from JSON
+  const loadDefaultCollections = async () => {
+    try {
+      const response = await fetch('/default-collections.json')
+      if (!response.ok) {
+        throw new Error('Failed to load default collections')
+      }
+      const defaultCollections = await response.json()
+
+      // Add default collections to the store
+      defaultCollections.forEach((col: { id: string; name: string; words: string[] }) => {
+        // Check if collection already exists
+        const exists = collections.value.find(c => c.id === col.id)
+        if (!exists) {
+          collections.value.push({
+            id: col.id,
+            name: col.name,
+            words: col.words
+          })
+        }
+      })
+
+      saveToLocalStorage()
+    } catch (error) {
+      console.error('Error loading default collections:', error)
+    }
+  }
+
   // Load collections from localStorage
   const loadFromLocalStorage = () => {
     try {
@@ -32,15 +60,8 @@ export const useCollectionsStore = defineStore('collections', () => {
       if (stored) {
         collections.value = JSON.parse(stored)
       } else {
-        // Initialize with sample collection if no data exists
-        collections.value = [
-          {
-            id: generateId(),
-            name: 'Sample Words',
-            words: ['we', 'see', 'my', 'he', 'she', 'with', 'said']
-          }
-        ]
-        saveToLocalStorage()
+        // Initialize with empty array, will load defaults separately
+        collections.value = []
       }
     } catch (error) {
       console.error('Error loading collections from localStorage:', error)
@@ -279,6 +300,7 @@ export const useCollectionsStore = defineStore('collections', () => {
   return {
     collections,
     loadFromLocalStorage,
+    loadDefaultCollections,
     saveToLocalStorage,
     addCollection,
     updateCollection,
