@@ -15,37 +15,80 @@ const props = withDefaults(defineProps<Props>(), {
   showMinSessions: 3
 })
 
-// Calculate path for line graph
-const graphPath = computed(() => {
-  if (props.sessions.length < props.showMinSessions) {
-    return ''
+// Calculate data points for visualization (always show 10 positions)
+const dataPoints = computed(() => {
+  const maxSessions = 10
+  const points: { x: number; y: number; accuracy: number | null; color: string; hasData: boolean }[] = []
+
+  // Calculate how many empty slots we need on the left
+  const numSessions = props.sessions.length
+  const numEmptySlots = Math.max(0, maxSessions - numSessions)
+
+  // Create all 10 positions
+  for (let i = 0; i < maxSessions; i++) {
+    const x = (i / Math.max(maxSessions - 1, 1)) * props.width
+
+    // First fill empty slots on the left, then add data from right
+    if (i < numEmptySlots) {
+      // Empty slot on the left - white circle on x-axis
+      points.push({
+        x,
+        y: props.height,
+        accuracy: null,
+        color: 'white',
+        hasData: false
+      })
+    } else {
+      // Data point - get session from the sessions array
+      const sessionIndex = i - numEmptySlots
+      const session = props.sessions[sessionIndex]
+
+      if (session && session.attempted > 0) {
+        // Calculate accuracy as percentage: correct/attempted * 100
+        const accuracy = (session.correct / session.attempted) * 100
+        const y = props.height - (accuracy / 100) * props.height
+
+        // Determine color based on accuracy
+        let color: string
+        if (accuracy >= 90) {
+          color = '#10b981' // green-500
+        } else if (accuracy >= 70) {
+          color = '#84cc16' // lime-500
+        } else if (accuracy >= 50) {
+          color = '#eab308' // yellow-500
+        } else if (accuracy >= 30) {
+          color = '#f97316' // orange-500
+        } else {
+          color = '#ef4444' // red-500
+        }
+
+        points.push({ x, y, accuracy, color, hasData: true })
+      } else {
+        // Fallback: no data - white circle
+        points.push({
+          x,
+          y: props.height,
+          accuracy: null,
+          color: 'white',
+          hasData: false
+        })
+      }
+    }
   }
 
-  const points: { x: number; y: number; accuracy: number }[] = []
+  return points
+})
 
-  // Calculate accuracy for each session
-  for (let i = 0; i < props.sessions.length; i++) {
-    const session = props.sessions[i]
-    if (!session) continue
+// Calculate path for connecting line (connect all circles)
+const linePath = computed(() => {
+  if (dataPoints.value.length < 2) return ''
 
-    // Calculate accuracy as percentage: correct/attempted * 100
-    const accuracy = session.attempted > 0 ? (session.correct / session.attempted) * 100 : 0
-
-    const x = (i / Math.max(props.sessions.length - 1, 1)) * props.width
-    const y = props.height - (accuracy / 100) * props.height
-
-    points.push({ x, y, accuracy })
-  }
-
-  // Create SVG path
-  if (points.length === 0) return ''
-
-  const firstPoint = points[0]
+  const firstPoint = dataPoints.value[0]
   if (!firstPoint) return ''
 
   let path = `M ${firstPoint.x} ${firstPoint.y}`
-  for (let i = 1; i < points.length; i++) {
-    const point = points[i]
+  for (let i = 1; i < dataPoints.value.length; i++) {
+    const point = dataPoints.value[i]
     if (point) {
       path += ` L ${point.x} ${point.y}`
     }
@@ -53,53 +96,38 @@ const graphPath = computed(() => {
 
   return path
 })
-
-// Create vertical gradient for accuracy levels (red at bottom, green at top)
-const gradientId = computed(() => {
-  return `gradient-${Math.random().toString(36).substring(7)}`
-})
-
-const hasEnoughData = computed(() => {
-  return props.sessions.length >= props.showMinSessions
-})
 </script>
 
 <template>
   <div class="inline-block">
     <svg
-      v-if="hasEnoughData"
       :width="width"
       :height="height"
       class="overflow-visible"
       :viewBox="`0 0 ${width} ${height}`"
     >
-      <defs>
-        <!-- Vertical gradient from red (bottom) to green (top) -->
-        <linearGradient :id="gradientId" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stop-color="#ef4444" />   <!-- red-500: 0-70% -->
-          <stop offset="50%" stop-color="#eab308" />  <!-- yellow-500: 80% -->
-          <stop offset="100%" stop-color="#10b981" /> <!-- green-500: 100% -->
-        </linearGradient>
-      </defs>
-
-      <!-- Line with gradient stroke -->
+      <!-- Connecting line (only between points with data) -->
       <path
-        :d="graphPath"
+        v-if="linePath"
+        :d="linePath"
         fill="none"
-        :stroke="`url(#${gradientId})`"
-        stroke-width="2"
+        stroke="#d1d5db"
+        stroke-width="1.5"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
-    </svg>
 
-    <!-- Placeholder when not enough data -->
-    <div
-      v-else
-      :style="{ width: `${width}px`, height: `${height}px` }"
-      class="flex items-center justify-center text-gray-300 text-xs"
-    >
-      <span>—</span>
-    </div>
+      <!-- Data point circles (colored if has data, transparent outline if no data) -->
+      <circle
+        v-for="(point, index) in dataPoints"
+        :key="index"
+        :cx="point.x"
+        :cy="point.y"
+        r="4"
+        :fill="point.color"
+        :stroke="point.hasData ? 'white' : '#d1d5db'"
+        stroke-width="1.5"
+      />
+    </svg>
   </div>
 </template>

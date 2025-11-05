@@ -36,24 +36,20 @@
               class="w-6 h-6 text-teal-500 rounded-lg focus:ring-2 focus:ring-teal-400 flex-shrink-0"
             />
 
-            <!-- Collection Name and Graph Container -->
-            <div class="flex-1 flex items-center gap-4">
-              <!-- Collection Name (Accordion Toggle) -->
-              <button
-                @click="toggleExpanded(collection.id)"
-                class="text-left text-xl font-bold hover:text-teal-600 transition-colors text-gray-800"
-              >
-                {{ collection.name }} ({{ collection.words.length }})
-              </button>
+            <!-- Collection Name (Accordion Toggle) - Maximized Width -->
+            <button
+              @click="toggleExpanded(collection.id)"
+              class="flex-1 text-left text-xl font-bold hover:text-teal-600 transition-colors text-gray-800"
+            >
+              {{ collection.name }} ({{ collection.words.length }})
+            </button>
 
-              <!-- Collection-level Sparkline -->
-              <SparklineGraph
-                :sessions="collectionsStore.getCollectionSessions(collection.id)"
-                :width="120"
-                :height="30"
-                :show-min-sessions="1"
-              />
-            </div>
+            <!-- Last Practice Result Indicator -->
+            <div
+              v-if="getLastSessionColor(collection.id)"
+              :style="{ backgroundColor: getLastSessionColor(collection.id) || undefined }"
+              class="w-1.5 self-stretch rounded-full flex-shrink-0"
+            ></div>
 
             <!-- Action Buttons -->
             <div class="flex flex-col gap-1 items-center flex-shrink-0">
@@ -74,11 +70,22 @@
             </div>
           </div>
 
-          <!-- Expanded Word List -->
+          <!-- Expanded View -->
           <div
             v-if="expandedCollections.has(collection.id)"
             class="mt-4 pt-4 border-t-2 border-teal-100"
           >
+            <!-- Collection-level Progress Graph -->
+            <div class="mb-4 flex items-center justify-center">
+              <SparklineGraph
+                :sessions="collectionsStore.getCollectionSessions(collection.id)"
+                :width="200"
+                :height="50"
+                :show-min-sessions="1"
+              />
+            </div>
+
+            <!-- Word List -->
             <div class="space-y-2">
               <div
                 v-for="(word, index) in collection.words"
@@ -166,6 +173,31 @@ const confirmDelete = (id: string, name: string) => {
 
 const getTotalWords = (): number => {
   return collectionsStore.getWordsFromCollections(selectedCollections.value).length
+}
+
+const getLastSessionColor = (collectionId: string): string | null => {
+  const sessions = collectionsStore.getCollectionSessions(collectionId)
+  if (sessions.length === 0) return null
+
+  // Get the last (most recent) session
+  const lastSession = sessions[sessions.length - 1]
+  if (!lastSession || lastSession.attempted === 0) return null
+
+  // Calculate accuracy
+  const accuracy = (lastSession.correct / lastSession.attempted) * 100
+
+  // Return color based on accuracy (matching SparklineGraph logic)
+  if (accuracy >= 90) {
+    return '#10b981' // green-500
+  } else if (accuracy >= 70) {
+    return '#84cc16' // lime-500
+  } else if (accuracy >= 50) {
+    return '#eab308' // yellow-500
+  } else if (accuracy >= 30) {
+    return '#f97316' // orange-500
+  } else {
+    return '#ef4444' // red-500
+  }
 }
 
 const startPractice = () => {
