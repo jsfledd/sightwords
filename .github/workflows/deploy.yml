@@ -27,13 +27,14 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies with Yarn
-        run: |
-          npm install -g yarn
-          yarn install --frozen-lockfile=false
+        run: yarn install
 
       - name: Build
-        run: yarn build:ci
+        run: yarn vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
