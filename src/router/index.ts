@@ -4,6 +4,7 @@ import CreateEditCollectionView from '../views/CreateEditCollectionView.vue'
 import PracticeView from '../views/PracticeView.vue'
 import AdminView from '../views/AdminView.vue'
 import AddCollectionsView from '../views/AddCollectionsView.vue'
+import AdminInstallView from '../views/AdminInstallView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,11 @@ const router = createRouter({
       path: '/addCollections',
       name: 'add-collections',
       component: AddCollectionsView
+    },
+    {
+      path: '/install-admin',
+      name: 'install-admin',
+      component: AdminInstallView
     }
   ]
 })

@@ -4,12 +4,20 @@
     <div class="max-w-4xl mx-auto mb-8">
       <div class="flex items-center justify-between mb-4">
         <h1 class="text-4xl font-bold text-teal-700">Admin: Default Collections</h1>
-        <button
-          @click="goBack"
-          class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all"
-        >
-          Back
-        </button>
+        <div class="flex gap-2">
+          <button
+            @click="goToInstall"
+            class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all"
+          >
+            📱 Install Admin PWA
+          </button>
+          <button
+            @click="goBack"
+            class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all"
+          >
+            Back
+          </button>
+        </div>
       </div>
       <p class="text-gray-600">
         Manage the default collections that are loaded from the JSON file.
@@ -287,6 +295,10 @@ const generateShareLink = () => {
     // Fallback: show the URL in a prompt
     prompt('Copy this share link:', shareUrl)
   })
+}
+
+const goToInstall = () => {
+  router.push('/install-admin')
 }
 
 const goBack = () => {

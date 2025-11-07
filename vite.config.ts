@@ -1,15 +1,24 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
+import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/sightwords/',
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        admin: resolve(__dirname, 'admin.html')
+      }
+    }
+  },
   plugins: [
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon_192.png', 'icon_512.png'],
+      includeAssets: ['icon_192.png', 'icon_512.png', 'admin-manifest.webmanifest'],
       manifest: {
         name: 'Sight Words Flashcards',
         short_name: 'Sight Words',
@@ -18,19 +27,21 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
+        start_url: '/sightwords/',
+        scope: '/sightwords/',
         icons: [
           {
-            src: '/icon_192.png',
+            src: '/sightwords/icon_192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon_512.png',
+            src: '/sightwords/icon_512.png',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/icon_512.png',
+            src: '/sightwords/icon_512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
