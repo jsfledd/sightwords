@@ -29,10 +29,15 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps --include=dev
+
+      - name: Verify vite installation
+        run: |
+          ls -la node_modules/.bin/vite || echo "vite not found in node_modules/.bin"
+          npx vite --version || echo "vite not accessible via npx"
 
       - name: Build
-        run: npm run build:ci
+        run: npx vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
