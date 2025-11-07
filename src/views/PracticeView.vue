@@ -65,10 +65,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useCollectionsStore } from '../stores/collections'
+import { useSettingsStore } from '../stores/settings'
 
 const router = useRouter()
 const route = useRoute()
 const collectionsStore = useCollectionsStore()
+const settingsStore = useSettingsStore()
 
 const queue = ref<{ word: string; collectionId: string }[]>([])
 const current = ref(0)
@@ -123,8 +125,13 @@ const initializePractice = () => {
     return
   }
 
-  // Shuffle and initialize queue
-  queue.value = shuffle([...wordPairs])
+  // Shuffle if setting is enabled, otherwise use as-is
+  if (settingsStore.practiceSettings.shuffleWords) {
+    queue.value = shuffle([...wordPairs])
+  } else {
+    queue.value = [...wordPairs]
+  }
+
   totalWords.value = queue.value.length
   current.value = 0
   correctCount.value = 0
@@ -159,8 +166,10 @@ const mark = (correct: boolean) => {
     // Increment correct count only when marked correct
     correctCount.value++
   } else {
-    // If incorrect, add word back to the end of queue
-    queue.value.push(currentItem)
+    // If incorrect and recycle setting is enabled, add word back to the beginning of queue
+    if (settingsStore.practiceSettings.recycleIncorrect) {
+      queue.value.splice(current.value + 1, 0, currentItem)
+    }
   }
 
   current.value++

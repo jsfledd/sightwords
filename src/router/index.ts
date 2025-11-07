@@ -5,6 +5,7 @@ import PracticeView from '../views/PracticeView.vue'
 import AdminView from '../views/AdminView.vue'
 import AddCollectionsView from '../views/AddCollectionsView.vue'
 import AdminInstallView from '../views/AdminInstallView.vue'
+import SettingsView from '../views/SettingsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +44,11 @@ const router = createRouter({
       path: '/install-admin',
       name: 'install-admin',
       component: AdminInstallView
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: SettingsView
     }
   ]
 })
