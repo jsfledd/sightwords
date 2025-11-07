@@ -69,6 +69,7 @@
               <label class="block text-sm font-semibold text-gray-600 mb-1">Collection Name</label>
               <input
                 v-model="collection.name"
+                @input="saveToLocalStorage"
                 type="text"
                 class="w-full px-4 py-2 border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:outline-none"
                 placeholder="Collection Name"
@@ -124,6 +125,8 @@ interface DefaultCollection {
   wordsText?: string // For textarea editing
 }
 
+const ADMIN_STORAGE_KEY = 'flashcards-admin-collections'
+
 const router = useRouter()
 const loading = ref(true)
 const error = ref<string | null>(null)
@@ -131,8 +134,47 @@ const successMessage = ref<string | null>(null)
 const defaultCollections = ref<DefaultCollection[]>([])
 
 onMounted(() => {
-  loadFromJson()
+  loadFromLocalStorage()
 })
+
+const loadFromLocalStorage = () => {
+  loading.value = true
+  error.value = null
+  successMessage.value = null
+
+  try {
+    const stored = localStorage.getItem(ADMIN_STORAGE_KEY)
+    if (stored) {
+      // Load from localStorage
+      const data = JSON.parse(stored)
+      defaultCollections.value = data.map((col: DefaultCollection) => ({
+        ...col,
+        wordsText: col.words.join(', ')
+      }))
+    } else {
+      // First time: load from JSON file
+      loadFromJson()
+      return
+    }
+    loading.value = false
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Unknown error loading from localStorage'
+    loading.value = false
+  }
+}
+
+const saveToLocalStorage = () => {
+  try {
+    const dataToSave = defaultCollections.value.map(col => ({
+      id: col.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      name: col.name,
+      words: col.words
+    }))
+    localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(dataToSave))
+  } catch (e) {
+    console.error('Error saving to localStorage:', e)
+  }
+}
 
 const loadFromJson = async () => {
   loading.value = true
@@ -152,6 +194,8 @@ const loadFromJson = async () => {
       wordsText: col.words.join(', ')
     }))
 
+    // Save to localStorage for future loads
+    saveToLocalStorage()
     loading.value = false
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Unknown error occurred'
@@ -162,6 +206,7 @@ const loadFromJson = async () => {
 const updateWords = (collection: DefaultCollection) => {
   if (!collection.wordsText) {
     collection.words = []
+    saveToLocalStorage()
     return
   }
 
@@ -170,6 +215,9 @@ const updateWords = (collection: DefaultCollection) => {
     .split(/[,\s\n]+/)
     .map(word => word.trim())
     .filter(word => word.length > 0)
+
+  // Save to localStorage whenever words are updated
+  saveToLocalStorage()
 }
 
 const addNewCollection = () => {
@@ -180,12 +228,14 @@ const addNewCollection = () => {
     words: [],
     wordsText: ''
   })
+  saveToLocalStorage()
 }
 
 const deleteCollection = (index: number) => {
   const collection = defaultCollections.value[index]
   if (confirm(`Are you sure you want to delete "${collection?.name}"?`)) {
     defaultCollections.value.splice(index, 1)
+    saveToLocalStorage()
   }
 }
 
