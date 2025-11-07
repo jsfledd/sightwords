@@ -44,6 +44,12 @@
             Save to file
           </button>
           <button
+            @click="generateShareLink"
+            class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
+          >
+            📤 Generate Share Link
+          </button>
+          <button
             @click="addNewCollection"
             class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
           >
@@ -109,6 +115,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { generateShareUrl } from '../utils/shareCollections'
 
 interface DefaultCollection {
   id: string
@@ -207,6 +214,29 @@ const saveToJson = () => {
   setTimeout(() => {
     successMessage.value = null
   }, 5000)
+}
+
+const generateShareLink = () => {
+  // Prepare collections data for sharing
+  const collectionsToShare = defaultCollections.value.map(col => ({
+    name: col.name,
+    words: col.words
+  }))
+
+  // Generate the share URL
+  const baseUrl = window.location.origin + (import.meta.env.BASE_URL || '/')
+  const shareUrl = generateShareUrl(collectionsToShare, baseUrl)
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    successMessage.value = 'Share link copied to clipboard!'
+    setTimeout(() => {
+      successMessage.value = null
+    }, 3000)
+  }).catch(() => {
+    // Fallback: show the URL in a prompt
+    prompt('Copy this share link:', shareUrl)
+  })
 }
 
 const goBack = () => {

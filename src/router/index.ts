@@ -3,6 +3,7 @@ import CollectionsView from '../views/CollectionsView.vue'
 import CreateEditCollectionView from '../views/CreateEditCollectionView.vue'
 import PracticeView from '../views/PracticeView.vue'
 import AdminView from '../views/AdminView.vue'
+import AddCollectionsView from '../views/AddCollectionsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,11 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: AdminView
+    },
+    {
+      path: '/addCollections',
+      name: 'add-collections',
+      component: AddCollectionsView
     }
   ]
 })
