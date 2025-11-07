@@ -26,18 +26,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps --include=dev
-
-      - name: Verify vite installation
+      - name: Install dependencies with Yarn
         run: |
-          ls -la node_modules/.bin/vite || echo "vite not found in node_modules/.bin"
-          npx vite --version || echo "vite not accessible via npx"
+          npm install -g yarn
+          yarn install --frozen-lockfile=false
 
       - name: Build
-        run: npx vite build
+        run: yarn build:ci
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
