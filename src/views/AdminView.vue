@@ -2,23 +2,7 @@
   <div class="min-h-screen px-4 py-8">
     <!-- Header -->
     <div class="max-w-4xl mx-auto mb-8">
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="text-4xl font-bold text-teal-700">Admin: Default Collections</h1>
-        <div class="flex gap-2">
-          <button
-            @click="goToInstall"
-            class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all"
-          >
-            📱 Install Admin PWA
-          </button>
-          <button
-            @click="goBack"
-            class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all"
-          >
-            Back
-          </button>
-        </div>
-      </div>
+      <h1 class="text-4xl font-bold text-teal-700 mb-4">Admin: Default Collections</h1>
       <p class="text-gray-600">
         Manage the default collections that are loaded from the JSON file.
       </p>
@@ -40,22 +24,16 @@
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-3 mb-6">
           <button
-            @click="loadFromJson"
-            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
-          >
-            Reload from file
-          </button>
-          <button
-            @click="saveToJson"
-            class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
-          >
-            Save to file
-          </button>
-          <button
             @click="generateShareLink"
             class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
           >
             📤 Generate Share Link
+          </button>
+          <button
+            @click="goToInstall"
+            class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
+          >
+            📱 Install Admin PWA
           </button>
           <button
             @click="addNewCollection"
@@ -247,33 +225,6 @@ const deleteCollection = (index: number) => {
   }
 }
 
-const saveToJson = () => {
-  // Prepare data for download - generate IDs from names
-  const dataToSave = defaultCollections.value.map(col => ({
-    id: col.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-    name: col.name,
-    words: col.words
-  }))
-
-  const jsonString = JSON.stringify(dataToSave, null, 2)
-  const blob = new Blob([jsonString], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-
-  // Create download link
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'default-collections.json'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-
-  successMessage.value = 'JSON file downloaded! Replace the file in /public/ directory.'
-  setTimeout(() => {
-    successMessage.value = null
-  }, 5000)
-}
-
 const generateShareLink = () => {
   // Prepare collections data for sharing
   const collectionsToShare = defaultCollections.value.map(col => ({
@@ -299,9 +250,5 @@ const generateShareLink = () => {
 
 const goToInstall = () => {
   router.push('/install-admin')
-}
-
-const goBack = () => {
-  router.push('/')
 }
 </script>

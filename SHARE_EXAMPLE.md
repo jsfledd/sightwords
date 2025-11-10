@@ -22,7 +22,7 @@ When you receive a share link, simply:
 ### Example Share URL Format
 
 ```
-https://jfledd.github.io/sightwords/addCollections?collections=W3sibmFtZSI6Ikxpc3QgMSIsIndvcmRzIjpbInRoZSIsImFuZCIsImlzIl19XQ==
+https://jsfledd.github.io/sightwords/#/addCollections?collections=W3sibmFtZSI6Ikxpc3QgMSIsIndvcmRzIjpbInRoZSIsImFuZCIsImlzIl19XQ==
 ```
 
 The `collections` parameter contains base64-encoded JSON data with collection names and words.
@@ -39,10 +39,11 @@ const collections = [
 
 const shareUrl = generateShareUrl(
   collections,
-  'https://jfledd.github.io/sightwords'
+  'https://jsfledd.github.io/sightwords'
 )
 
 console.log(shareUrl)
+// Returns: https://jsfledd.github.io/sightwords/#/addCollections?collections=...
 ```
 
 ### Test Link (List 1, 2, 3)
@@ -50,7 +51,7 @@ console.log(shareUrl)
 Here's a test link with the default collections:
 
 ```
-https://jfledd.github.io/sightwords/addCollections?collections=W3sibmFtZSI6Ikxpc3QgMSIsIndvcmRzIjpbInRoZSIsImFuZCIsImlzIiwiaXQiLCJpbiIsInRvIiwieW91IiwiaGUiLCJ3ZSIsIm1lIl19LHsibmFtZSI6Ikxpc3QgMiIsIndvcmRzIjpbImEiLCJJIiwic2VlIiwiY2FuIiwibGlrZSIsImdvIiwibXkiLCJhdCIsInVwIiwibm8iXX0seyJuYW1lIjoiTGlzdCAzIiwid29yZHMiOlsiYW0iLCJkbyIsInNvIiwib24iLCJiZSIsInNoZSIsInNhaWQiLCJmb3IiLCJoZXJlIiwibG9vayJdfV0=
+https://jsfledd.github.io/sightwords/#/addCollections?collections=W3sibmFtZSI6Ikxpc3QgMSIsIndvcmRzIjpbInRoZSIsImFuZCIsImlzIiwiaXQiLCJpbiIsInRvIiwieW91IiwiaGUiLCJ3ZSIsIm1lIl19LHsibmFtZSI6Ikxpc3QgMiIsIndvcmRzIjpbImEiLCJJIiwic2VlIiwiY2FuIiwibGlrZSIsImdvIiwibXkiLCJhdCIsInVwIiwibm8iXX0seyJuYW1lIjoiTGlzdCAzIiwid29yZHMiOlsiYW0iLCJkbyIsInNvIiwib24iLCJiZSIsInNoZSIsInNhaWQiLCJmb3IiLCJoZXJlIiwibG9vayJdfV0=
 ```
 
 ## Features

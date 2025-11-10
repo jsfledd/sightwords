@@ -20,11 +20,12 @@ export function generateShareUrl(collections: ShareableCollection[], baseUrl: st
   // Encode to base64
   const encodedData = btoa(jsonData)
 
-  // Create the URL
-  const url = new URL('/addCollections', baseUrl)
-  url.searchParams.set('collections', encodedData)
+  // Create the URL with hash routing for SPA
+  // Remove trailing slash from baseUrl if present
+  const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
+  const shareUrl = `${cleanBaseUrl}/#/addCollections?collections=${encodedData}`
 
-  return url.toString()
+  return shareUrl
 }
 
 /**

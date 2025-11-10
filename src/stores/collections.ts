@@ -39,13 +39,25 @@ export const useCollectionsStore = defineStore('collections', () => {
       // Add default collections to the store
       defaultCollections.forEach((col: { id: string; name: string; words: string[] }) => {
         // Check if collection already exists
-        const exists = collections.value.find(c => c.id === col.id)
-        if (!exists) {
+        const existingIndex = collections.value.findIndex(c => c.id === col.id)
+        if (existingIndex === -1) {
+          // Collection doesn't exist, add it
           collections.value.push({
             id: col.id,
             name: col.name,
             words: col.words
           })
+        } else {
+          // Collection exists - update words but preserve stats
+          const existing = collections.value[existingIndex]
+          if (existing) {
+            collections.value[existingIndex] = {
+              id: col.id,
+              name: col.name,
+              words: col.words,
+              stats: existing.stats // Preserve existing stats
+            }
+          }
         }
       })
 
@@ -109,13 +121,22 @@ export const useCollectionsStore = defineStore('collections', () => {
   const updateCollection = (id: string, name: string, words: string[]) => {
     const index = collections.value.findIndex(c => c.id === id)
     if (index !== -1) {
-      collections.value[index] = {
-        id,
-        name: name.trim(),
-        words: words.filter(word => word.trim() !== '').map(word => word.trim())
+      const existingCollection = collections.value[index]
+      if (existingCollection) {
+        const cleanWords = words.filter(word => word.trim() !== '').map(word => word.trim())
+
+        // Preserve existing stats if they exist
+        const preservedStats = existingCollection.stats
+
+        collections.value[index] = {
+          id,
+          name: name.trim(),
+          words: cleanWords,
+          stats: preservedStats // Keep the existing stats
+        }
+        saveToLocalStorage()
+        return true
       }
-      saveToLocalStorage()
-      return true
     }
     return false
   }
