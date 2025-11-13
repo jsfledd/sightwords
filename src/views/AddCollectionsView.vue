@@ -113,8 +113,11 @@ const hasSelectedCollections = computed(() => {
   return collections.value.some(c => c.selected)
 })
 
-onMounted(() => {
+onMounted(async () => {
   try {
+    // Ensure collections store is loaded first
+    await collectionsStore.loadFromLocalStorage()
+
     const collectionsParam = route.query.collections as string
     if (!collectionsParam) {
       error.value = 'No collections data found in URL'
