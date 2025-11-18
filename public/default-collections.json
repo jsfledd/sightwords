@@ -1,67 +1,52 @@
 [
   {
-    "id": "list-1",
-    "name": "List 1",
-    "words": ["the", "and", "is", "it", "in", "to", "you", "he", "we", "me"]
-  },
-  {
-    "id": "list-2",
-    "name": "List 2",
-    "words": ["a", "I", "see", "can", "like", "go", "my", "at", "up", "no"]
-  },
-  {
-    "id": "list-3",
-    "name": "List 3",
-    "words": ["am", "do", "so", "on", "be", "she", "said", "for", "here", "look"]
-  },
-  {
-    "id": "ka-list-1",
-    "name": "KA List 1",
+    "id": "k-list-1",
+    "name": "List 1 (K)",
     "words": ["the", "of", "and", "a", "to", "in", "is", "you", "that", "it"]
   },
   {
-    "id": "ka-list-2",
-    "name": "KA List 2",
+    "id": "k-list-2",
+    "name": "List 2 (K)",
     "words": ["he", "was", "for", "on", "are", "as", "with", "his", "they", "I"]
   },
   {
-    "id": "ka-list-3",
-    "name": "KA List 3",
+    "id": "k-list-3",
+    "name": "List 3 (K)",
     "words": ["at", "be", "this", "have", "from", "or", "one", "had", "by", "words"]
   },
   {
-    "id": "ka-list-4",
-    "name": "KA List 4",
+    "id": "k-list-4",
+    "name": "List 4 (K)",
     "words": ["but", "not", "what", "all", "were", "we", "when", "your", "can", "said"]
   },
   {
-    "id": "ka-list-5",
-    "name": "KA List 5",
+    "id": "k-list-5",
+    "name": "List 5 (K)",
     "words": ["there", "use", "an", "each", "which", "she", "do", "how", "their", "if"]
   },
   {
-    "id": "ka-list-6",
-    "name": "KA List 6",
+    "id": "k-list-6",
+    "name": "List 6 (K)",
     "words": ["will", "up", "other", "about", "out", "many", "then", "them", "these", "so"]
   },
   {
-    "id": "ka-list-7",
-    "name": "KA List 7",
+    "id": "k-list-7",
+    "name": "List 7 (K)",
     "words": ["some", "her", "would", "make", "like", "him", "into", "time", "has", "look"]
   },
   {
-    "id": "ka-list-8",
-    "name": "KA List 8",
+    "id": "k-list-8",
+    "name": "List 8 (K)",
     "words": ["two", "more", "write", "go", "see", "number", "no", "way", "could", "people"]
   },
   {
-    "id": "ka-list-9",
-    "name": "KA List 9",
+    "id": "k-list-9",
+    "name": "List 9 (K)",
     "words": ["my", "than", "first", "water", "been", "called", "who", "am", "its", "now"]
   },
   {
-    "id": "ka-list-10",
-    "name": "KA List 10",
+    "id": "k-list-10",
+    "name": "List 1 (K)0",
     "words": ["find", "long", "down", "day", "did", "get", "come", "made", "may", "part"]
   }
 ]
