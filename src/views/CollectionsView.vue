@@ -33,7 +33,7 @@
 
       <div v-else class="space-y-4">
         <div
-          v-for="collection in collectionsStore.collections"
+          v-for="collection in sortedCollections"
           :key="collection.id"
           class="bg-white rounded-3xl shadow-lg p-3 border-2 border-teal-100"
         >
@@ -66,14 +66,14 @@
             <!-- Action Buttons -->
             <div class="flex flex-col gap-1 items-center flex-shrink-0">
               <button
-                @click="navigateToEdit(collection.id)"
+                @click.stop="navigateToEdit(collection.id)"
                 class="text-teal-600 hover:text-teal-700 font-semibold px-2 py-2 rounded-full hover:bg-teal-50 transition-colors"
                 title="Edit"
               >
                 ⚙️
               </button>
               <button
-                @click="confirmDelete(collection.id, collection.name)"
+                @click.stop="confirmDelete(collection.id, collection.name)"
                 class="text-orange-600 hover:text-orange-700 font-semibold px-2 py-2 rounded-full hover:bg-orange-50 transition-colors"
                 title="Delete"
               >
@@ -143,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCollectionsStore } from '../stores/collections'
 import SparklineGraph from '../components/SparklineGraph.vue'
@@ -153,6 +153,13 @@ const collectionsStore = useCollectionsStore()
 
 const selectedCollections = ref<string[]>([])
 const expandedCollections = ref<Set<string>>(new Set())
+
+// Computed property to sort collections by name
+const sortedCollections = computed(() => {
+  return [...collectionsStore.collections].sort((a, b) => {
+    return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+  })
+})
 
 // Load collections on mount
 onMounted(async () => {
