@@ -61,9 +61,36 @@
         </div>
       </div>
 
+      <!-- Data Management Section -->
+      <div class="bg-white rounded-3xl shadow-lg p-6 border-2 border-teal-100 mb-6">
+        <h2 class="text-2xl font-bold text-teal-700 mb-4">Data Management</h2>
+        <p class="text-gray-600 mb-6">Manage your collections and progress data</p>
+
+        <div class="space-y-4">
+          <!-- Reset Collections Button -->
+          <div class="p-4 bg-orange-50 rounded-xl border-2 border-orange-200">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Reset Collections to Default</h3>
+            <p class="text-sm text-gray-600 mb-4">
+              This will replace all your collections with the default kindergarten word lists. Your custom collections and all progress data will be permanently deleted.
+            </p>
+            <button
+              @click="confirmResetCollections"
+              class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
+            >
+              Reset to Defaults
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Success Message -->
       <div v-if="showSaved" class="bg-green-50 border-2 border-green-200 rounded-3xl p-4 text-center">
         <p class="text-green-700 font-semibold">Settings saved!</p>
+      </div>
+
+      <!-- Reset Success Message -->
+      <div v-if="showReset" class="bg-green-50 border-2 border-green-200 rounded-3xl p-4 text-center">
+        <p class="text-green-700 font-semibold">Collections reset to defaults!</p>
       </div>
     </div>
   </div>
@@ -73,9 +100,11 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSettingsStore } from '../stores/settings'
+import { useCollectionsStore } from '../stores/collections'
 
 const router = useRouter()
 const settingsStore = useSettingsStore()
+const collectionsStore = useCollectionsStore()
 
 const localSettings = ref({
   shuffleWords: true,
@@ -83,6 +112,7 @@ const localSettings = ref({
 })
 
 const showSaved = ref(false)
+const showReset = ref(false)
 
 onMounted(() => {
   // Load current settings
@@ -96,6 +126,38 @@ const saveSettings = () => {
   showSaved.value = true
   setTimeout(() => {
     showSaved.value = false
+  }, 2000)
+}
+
+const confirmResetCollections = () => {
+  const confirmed = confirm(
+    'Are you sure you want to reset all collections to the defaults?\n\n' +
+    'This will:\n' +
+    '- Delete all your custom collections\n' +
+    '- Delete all progress data\n' +
+    '- Restore the default kindergarten word lists\n\n' +
+    'This action cannot be undone!'
+  )
+
+  if (confirmed) {
+    resetCollections()
+  }
+}
+
+const resetCollections = async () => {
+  // Clear localStorage
+  localStorage.removeItem('flashcards-collections')
+  localStorage.removeItem('flashcards-defaults-loaded')
+
+  // Reload defaults
+  await collectionsStore.loadDefaultCollections()
+
+  // Show success message
+  showReset.value = true
+  setTimeout(() => {
+    showReset.value = false
+    // Navigate back to home to show the reset collections
+    router.push('/')
   }, 2000)
 }
 
