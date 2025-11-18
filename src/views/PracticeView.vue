@@ -73,6 +73,7 @@ const collectionsStore = useCollectionsStore()
 const settingsStore = useSettingsStore()
 
 const queue = ref<{ word: string; collectionId: string }[]>([])
+const incorrectQueue = ref<{ word: string; collectionId: string }[]>([])
 const current = ref(0)
 const finished = ref(false)
 const totalWords = ref(0)
@@ -83,7 +84,7 @@ const selectedCollectionIds = ref<string[]>([])
 const sessionStats = ref<Map<string, { correct: number; attempted: number }>>(new Map())
 
 const wordsRemaining = computed(() => {
-  return queue.value.length - current.value
+  return queue.value.length - current.value + incorrectQueue.value.length
 })
 
 const progress = computed(() => {
@@ -91,11 +92,14 @@ const progress = computed(() => {
   return Math.round((correctCount.value / totalWords.value) * 100)
 })
 
-onMounted(() => {
-  initializePractice()
+onMounted(async () => {
+  await initializePractice()
 })
 
-const initializePractice = () => {
+const initializePractice = async () => {
+  // Ensure collections are loaded from localStorage
+  await collectionsStore.loadFromLocalStorage()
+
   // Get selected collection IDs from query params
   const collectionsParam = route.query.collections as string
   if (!collectionsParam) {
@@ -166,18 +170,35 @@ const mark = (correct: boolean) => {
     // Increment correct count only when marked correct
     correctCount.value++
   } else {
-    // If incorrect and recycle setting is enabled, add word back to the beginning of queue
+    // If incorrect and recycle setting is enabled, add word to incorrect queue
     if (settingsStore.practiceSettings.recycleIncorrect) {
-      queue.value.splice(current.value + 1, 0, currentItem)
+      incorrectQueue.value.push(currentItem)
     }
   }
 
   current.value++
 
-  // Check if we've gone through all words in the queue
+  // Check if we've gone through all words in the current queue
   if (current.value >= queue.value.length) {
-    finished.value = true
-    saveSessionData()
+    // If there are incorrect words to practice, add them to the queue and continue
+    if (incorrectQueue.value.length > 0) {
+      // Shuffle the incorrect queue if shuffle setting is enabled
+      const incorrectWords = settingsStore.practiceSettings.shuffleWords
+        ? shuffle([...incorrectQueue.value])
+        : [...incorrectQueue.value]
+
+      // Add incorrect words to the queue
+      queue.value.push(...incorrectWords)
+
+      // Clear the incorrect queue since we've added them back
+      incorrectQueue.value = []
+
+      // Don't increment current or mark as finished - just continue to next word
+    } else {
+      // No more words to practice, mark as finished
+      finished.value = true
+      saveSessionData()
+    }
   }
 }
 

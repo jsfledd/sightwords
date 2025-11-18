@@ -13,5 +13,55 @@
     "id": "list-3",
     "name": "List 3",
     "words": ["am", "do", "so", "on", "be", "she", "said", "for", "here", "look"]
+  },
+  {
+    "id": "ka-list-1",
+    "name": "KA List 1",
+    "words": ["the", "of", "and", "a", "to", "in", "is", "you", "that", "it"]
+  },
+  {
+    "id": "ka-list-2",
+    "name": "KA List 2",
+    "words": ["he", "was", "for", "on", "are", "as", "with", "his", "they", "I"]
+  },
+  {
+    "id": "ka-list-3",
+    "name": "KA List 3",
+    "words": ["at", "be", "this", "have", "from", "or", "one", "had", "by", "words"]
+  },
+  {
+    "id": "ka-list-4",
+    "name": "KA List 4",
+    "words": ["but", "not", "what", "all", "were", "we", "when", "your", "can", "said"]
+  },
+  {
+    "id": "ka-list-5",
+    "name": "KA List 5",
+    "words": ["there", "use", "an", "each", "which", "she", "do", "how", "their", "if"]
+  },
+  {
+    "id": "ka-list-6",
+    "name": "KA List 6",
+    "words": ["will", "up", "other", "about", "out", "many", "then", "them", "these", "so"]
+  },
+  {
+    "id": "ka-list-7",
+    "name": "KA List 7",
+    "words": ["some", "her", "would", "make", "like", "him", "into", "time", "has", "look"]
+  },
+  {
+    "id": "ka-list-8",
+    "name": "KA List 8",
+    "words": ["two", "more", "write", "go", "see", "number", "no", "way", "could", "people"]
+  },
+  {
+    "id": "ka-list-9",
+    "name": "KA List 9",
+    "words": ["my", "than", "first", "water", "been", "called", "who", "am", "its", "now"]
+  },
+  {
+    "id": "ka-list-10",
+    "name": "KA List 10",
+    "words": ["find", "long", "down", "day", "did", "get", "come", "made", "may", "part"]
   }
 ]

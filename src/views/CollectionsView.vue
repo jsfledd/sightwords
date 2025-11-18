@@ -143,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCollectionsStore } from '../stores/collections'
 import SparklineGraph from '../components/SparklineGraph.vue'
@@ -155,7 +155,9 @@ const selectedCollections = ref<string[]>([])
 const expandedCollections = ref<Set<string>>(new Set())
 
 // Load collections on mount
-collectionsStore.loadFromLocalStorage()
+onMounted(async () => {
+  await collectionsStore.loadFromLocalStorage()
+})
 
 const navigateToCreate = () => {
   router.push('/collection/new')

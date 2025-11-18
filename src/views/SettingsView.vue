@@ -54,7 +54,7 @@
                 Re-cycle Incorrect Words
               </label>
               <p class="text-sm text-gray-600">
-                When you mark a word as incorrect, add it back to the beginning of the practice queue to practice again
+                When you mark a word as incorrect, add it back into the practice queue so you'll see it again soon
               </p>
             </div>
           </div>

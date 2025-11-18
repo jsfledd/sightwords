@@ -92,7 +92,10 @@ const wordCount = computed(() => {
   return parseWords().length
 })
 
-onMounted(() => {
+onMounted(async () => {
+  // Ensure collections are loaded from localStorage
+  await collectionsStore.loadFromLocalStorage()
+
   // Load existing collection data if in edit mode
   if (isEditMode.value) {
     const collection = collectionsStore.getCollectionById(collectionId.value)
