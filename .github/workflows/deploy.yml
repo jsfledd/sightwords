@@ -48,7 +48,7 @@ jobs:
           fi
 
       - name: Build
-        run: npx vite build
+        run: npm run build:ci
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
