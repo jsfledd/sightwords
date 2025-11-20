@@ -37,33 +37,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Debug - Check installation
-        run: |
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Checking for .bin directory..."
-          ls -la node_modules/.bin/ | head -10
-          echo "Checking for vite in .bin..."
-          if [ -f "node_modules/.bin/vite" ]; then
-            echo "✓ vite binary exists in .bin"
-            file node_modules/.bin/vite
-          else
-            echo "✗ vite binary not found in .bin"
-          fi
-          echo "Checking vite package structure..."
-          if [ -d "node_modules/vite" ]; then
-            echo "✓ vite directory exists"
-            ls -la node_modules/vite/ | head -10
-          else
-            echo "✗ vite directory not found"
-          fi
-
-      - name: Create .bin symlinks manually
-        run: |
-          mkdir -p node_modules/.bin
-          ln -s ../vite/dist/node/cli.js node_modules/.bin/vite
-          chmod +x node_modules/.bin/vite
-
       - name: Build
         run: npm run build:ci
 
