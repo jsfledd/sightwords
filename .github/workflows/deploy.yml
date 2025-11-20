@@ -34,6 +34,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Debug - Check installation
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Checking node_modules..."
+          ls -la node_modules/ | head -20
+          echo "Checking for vite..."
+          if [ -d "node_modules/vite" ]; then
+            echo "✓ vite directory exists"
+            ls -la node_modules/vite/bin/ 2>/dev/null || echo "✗ vite/bin not found"
+          else
+            echo "✗ vite directory not found"
+          fi
+
       - name: Build
         run: npm run build:ci
 
