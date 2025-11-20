@@ -37,12 +37,19 @@ jobs:
         run: |
           echo "Node version: $(node --version)"
           echo "NPM version: $(npm --version)"
-          echo "Checking node_modules..."
-          ls -la node_modules/ | head -20
-          echo "Checking for vite..."
+          echo "Checking for .bin directory..."
+          ls -la node_modules/.bin/ | head -10
+          echo "Checking for vite in .bin..."
+          if [ -f "node_modules/.bin/vite" ]; then
+            echo "✓ vite binary exists in .bin"
+            file node_modules/.bin/vite
+          else
+            echo "✗ vite binary not found in .bin"
+          fi
+          echo "Checking vite package structure..."
           if [ -d "node_modules/vite" ]; then
             echo "✓ vite directory exists"
-            ls -la node_modules/vite/bin/ 2>/dev/null || echo "✗ vite/bin not found"
+            ls -la node_modules/vite/ | head -10
           else
             echo "✗ vite directory not found"
           fi
