@@ -54,6 +54,12 @@ jobs:
             echo "✗ vite directory not found"
           fi
 
+      - name: Create .bin symlinks manually
+        run: |
+          mkdir -p node_modules/.bin
+          ln -s ../vite/dist/node/cli.js node_modules/.bin/vite
+          chmod +x node_modules/.bin/vite
+
       - name: Build
         run: npm run build:ci
 
