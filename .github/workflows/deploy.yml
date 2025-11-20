@@ -32,7 +32,7 @@ jobs:
         run: npm ci --include=dev
 
       - name: Build
-        run: npm run build:ci
+        run: ./node_modules/.bin/vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
