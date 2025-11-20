@@ -31,7 +31,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install --force
+        uses: bahmutov/npm-install@v1
 
       - name: Debug - Check installation
         run: |
