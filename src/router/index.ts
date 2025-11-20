@@ -6,6 +6,8 @@ import AdminView from '../views/AdminView.vue'
 import AddCollectionsView from '../views/AddCollectionsView.vue'
 import AdminInstallView from '../views/AdminInstallView.vue'
 import SettingsView from '../views/SettingsView.vue'
+import AdminDataView from '../views/AdminDataView.vue'
+import ImportStatsView from '../views/ImportStatsView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -49,6 +51,16 @@ const router = createRouter({
       path: '/settings',
       name: 'settings',
       component: SettingsView
+    },
+    {
+      path: '/admin/data',
+      name: 'admin-data',
+      component: AdminDataView
+    },
+    {
+      path: '/importStats',
+      name: 'import-stats',
+      component: ImportStatsView
     }
   ]
 })

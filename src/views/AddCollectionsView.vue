@@ -161,14 +161,24 @@ const addCollections = async () => {
     if (existingCollection) {
       // Ask user if they want to overwrite
       const shouldOverwrite = confirm(
-        `A collection named "${collection.name}" already exists. Do you want to overwrite it?`
+        `A collection named "${collection.name}" already exists. Do you want to overwrite it?\n\n` +
+        `Note: Your progress stats will be preserved for matching words.`
       )
 
       if (shouldOverwrite) {
+        // Save existing stats before deletion
+        const existingStats = existingCollection.stats || []
+
         // Delete the existing collection
         collectionsStore.deleteCollection(existingCollection.id)
+
         // Add the new collection
-        collectionsStore.addCollection(collection.name, collection.words)
+        const newId = collectionsStore.addCollection(collection.name, collection.words)
+
+        // Merge stats back for matching words
+        if (existingStats.length > 0 && newId) {
+          collectionsStore.mergeStatsIntoCollection(newId, existingStats)
+        }
       }
       // If they don't want to overwrite, skip this collection
     } else {

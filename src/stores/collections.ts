@@ -249,9 +249,9 @@ export const useCollectionsStore = defineStore('collections', () => {
       attempted
     }
 
-    // Add to session queue (keep last 10 sessions)
+    // Add to session queue (keep last 25 sessions)
     wordStats.sessions.push(session)
-    if (wordStats.sessions.length > 10) {
+    if (wordStats.sessions.length > 25) {
       wordStats.sessions.shift() // Remove oldest
     }
 
@@ -328,6 +328,57 @@ export const useCollectionsStore = defineStore('collections', () => {
     return aggregatedSessions.slice(-limit)
   }
 
+  // Preserve stats before reset - returns stats map by collection ID
+  const preserveStatsBeforeReset = (): Map<string, WordStats[]> => {
+    const statsMap = new Map<string, WordStats[]>()
+    collections.value.forEach(collection => {
+      if (collection.stats && collection.stats.length > 0) {
+        statsMap.set(collection.id, collection.stats)
+      }
+    })
+    return statsMap
+  }
+
+  // Restore stats after reset - merges stats back by collection ID
+  const restoreStatsAfterReset = (statsMap: Map<string, WordStats[]>) => {
+    collections.value.forEach(collection => {
+      const savedStats = statsMap.get(collection.id)
+      if (savedStats) {
+        collection.stats = savedStats
+      }
+    })
+    saveToLocalStorage()
+  }
+
+  // Merge stats from existing collection into new collection
+  const mergeStatsIntoCollection = (collectionId: string, existingStats: WordStats[]) => {
+    const collection = getCollectionById(collectionId)
+    if (!collection) return
+
+    // Initialize stats if not exists
+    if (!collection.stats) {
+      collection.stats = []
+    }
+
+    // Merge stats for matching words
+    existingStats.forEach(existingStat => {
+      const existingWord = collection.words.find(w => w === existingStat.word)
+      if (existingWord) {
+        // Word exists in new collection, merge stats
+        const statIndex = collection.stats!.findIndex(s => s.word === existingStat.word)
+        if (statIndex >= 0) {
+          // Update existing stat
+          collection.stats![statIndex] = existingStat
+        } else {
+          // Add stat for this word
+          collection.stats!.push(existingStat)
+        }
+      }
+    })
+
+    saveToLocalStorage()
+  }
+
   return {
     collections,
     loadFromLocalStorage,
@@ -344,6 +395,9 @@ export const useCollectionsStore = defineStore('collections', () => {
     getWordStats,
     getWordPercentage,
     getRecentSessions,
-    getCollectionSessions
+    getCollectionSessions,
+    preserveStatsBeforeReset,
+    restoreStatsAfterReset,
+    mergeStatsIntoCollection
   }
 })

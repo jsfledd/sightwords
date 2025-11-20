@@ -145,12 +145,18 @@ const confirmResetCollections = () => {
 }
 
 const resetCollections = async () => {
+  // Preserve stats before clearing
+  const savedStats = collectionsStore.preserveStatsBeforeReset()
+
   // Clear localStorage
   localStorage.removeItem('flashcards-collections')
   localStorage.removeItem('flashcards-defaults-loaded')
 
   // Reload defaults
   await collectionsStore.loadDefaultCollections()
+
+  // Restore stats for matching collection IDs
+  collectionsStore.restoreStatsAfterReset(savedStats)
 
   // Show success message
   showReset.value = true

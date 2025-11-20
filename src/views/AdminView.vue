@@ -24,6 +24,12 @@
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-3 mb-6">
           <button
+            @click="goToDataManagement"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
+          >
+            📊 Manage Data
+          </button>
+          <button
             @click="generateShareLink"
             class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
           >
@@ -250,5 +256,9 @@ const generateShareLink = () => {
 
 const goToInstall = () => {
   router.push('/install-admin')
+}
+
+const goToDataManagement = () => {
+  router.push('/admin/data')
 }
 </script>
