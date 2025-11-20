@@ -30,8 +30,11 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Downgrade to npm 9
+        run: npm install -g npm@9
+
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+        run: npm ci
 
       - name: Debug - Check installation
         run: |
