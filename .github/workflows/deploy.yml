@@ -31,8 +31,11 @@ jobs:
       - name: Install dependencies
         run: npm ci --include=dev
 
+      - name: Debug - List node_modules
+        run: ls -la node_modules/.bin/ | head -20
+
       - name: Build
-        run: ./node_modules/.bin/vite build
+        run: npx vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
